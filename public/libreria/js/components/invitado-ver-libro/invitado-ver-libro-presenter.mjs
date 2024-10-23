@@ -1,13 +1,10 @@
 import { Presenter } from "../../commons/presenter.mjs";
+// import { Router } from "../../commons/router.mjs";
+import { model } from "../../model/model.mjs";
 
 export class InvitadoVerLibroPresenter extends Presenter {
-
   constructor(model, view) {
     super(model, view);
-  }
-
-  get catalogoElement() {
-    return document.querySelector('#catalogo');
   }
 
   get searchParams() {
@@ -18,17 +15,9 @@ export class InvitadoVerLibroPresenter extends Presenter {
     return this.searchParams.get('id');
   }
 
+  // para acceder al modelo, siempre con métodos, no con getters!
   getLibro() {
-    return this.model.getLibroPorId(this.id);
-  }
-
-  set libro(libro) {    
-    this.isbn = libro.isbn;
-    this.titulo = libro.titulo;
-    this.autores = libro.autores;
-    this.resumen = libro.resumen;
-    this.stock = libro.stock;
-    this.precio = libro.precio;
+    return model.getLibroPorId(this.id);
   }
 
   get isbnParagraph() {
@@ -77,7 +66,14 @@ export class InvitadoVerLibroPresenter extends Presenter {
     this.stockParagraph.textContent = stock;
   }
 
-
+  set libro(libro) {    
+    this.isbn = libro.isbn;
+    this.titulo = libro.titulo;
+    this.autores = libro.autores;
+    this.resumen = libro.resumen;
+    this.stock = libro.stock;
+    this.precio = libro.precio;
+  }
 
   async refresh() {
     await super.refresh();
@@ -86,9 +82,12 @@ export class InvitadoVerLibroPresenter extends Presenter {
     if (libro) this.libro = libro;
     else console.error(`Libro ${id} not found!`);
 
-    document.querySelector('#verLibroTitulo').textContent=`Titulo: ${libro.titulo}`
 
-
+    
+    // cuidado no asignar directamente el método, se pierde this!
+    // document.querySelector('#agregarButton').onclick = event => this.agregarClick(event);
+    // let self = this;
+    // document.querySelector('#agregarButton').onclick = function (event) { self.agregarClick(event) };
   }
 
 }

@@ -8,9 +8,15 @@ const PORT = 3000;
 const app = express();
 app.use('/', express.static(path.join(STATIC_DIR, 'public')));
 
-// app.use('/libreria*', (req, res) => {
-//   res.sendFile(path.join(STATIC_DIR, 'public/libreria/index.html'));
+
+// app.get('/libreria/api/*', (req, res) => {
+//   res.status(501).send('Not implemented, yet!');
 // });
+// app.use('/libreria/components', express.static(path.join(__dirname, 'public/components')));
+
+// app.use('/libreria/model', express.static(path.join(__dirname, 'public/model')));
+
+// app.use('/libreria/test', express.static(path.join(__dirname, 'public/test')));
 
 app.use('/libreria*', (req, res) => {
   res.sendFile(path.join(STATIC_DIR, 'public/libreria/index.html'));

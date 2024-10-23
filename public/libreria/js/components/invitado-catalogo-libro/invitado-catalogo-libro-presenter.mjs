@@ -5,17 +5,36 @@ export class InvitadoCatalogoLibroPresenter extends Presenter {
     super(model, view, parentSelector);
   }
 
-  async refresh() {
-    let html = await this.getHTML();
-    this.parentElement.insertAdjacentHTML('beforeend', html);
-
-    let node = this.parentElement.querySelector(`#titulo`);
-    node.setAttribute('id', `titulo_${this.model._id}`);
-    node.innerHTML = this.model.titulo;
-
-    node = this.parentElement.querySelector(`#verLink`);
-    node.setAttribute('id', `verLink_${this.model._id}`);
-    node.setAttribute('href', `invitado-ver-libro.html?id=${this.model._id}`);
-    this.attachAnchors();
+  setLibroField(name, value) {
+    let node = this.parentElement.querySelector(`#${name}`);
+    node.setAttribute('id', `${name}_${this.model._id}`);
+    node.innerHTML = value;
   }
+
+  setLibroFields() {
+    this.setLibroField('titulo', this.model.titulo);
+    this.setLibroField('autores', this.model.autores);
+    this.setLibroField('isbn', this.model.isbn);
+    this.setLibroField('precio', `€ ${this.model.precio}`);
+  }
+
+  setVerButton(){
+    let node = this.parentElement.querySelector(`#verButton`);
+    node.setAttribute('id', `ver_${this.model._id}`);
+    node.setAttribute('href', `invitado-ver-libro.html?id=${this.model._id}`);
+  }
+
+  async refresh() {
+    try {
+      let html = await this.getHTML();
+      this.parentElement.insertAdjacentHTML('beforeend', html);
+      this.setLibroFields();
+      this.setVerButton();
+      this.attachAnchors();
+    } catch (err) {
+      console.error(err);
+    };
+
+  }
+
 }
