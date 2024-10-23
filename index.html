@@ -3,145 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tienda de Libros - Librería Virtual</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
-        header {
-            background-color: #333;
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-        nav {
-            text-align: center;
-            margin-top: 20px;
-        }
-        nav a {
-            margin: 0 15px;
-            color: #333;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        h2 {
-            color: #333;
-        }
-        .book-list {
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-        }
-        .book {
-            background-color: white;
-            padding: 20px;
-            margin: 15px;
-            border: 1px solid #ddd;
-            width: 250px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        .book img {
-            max-width: 100%;
-            height: auto;
-        }
-        footer {
-            background-color: #333;
-            color: white;
-            text-align: center;
-            padding: 20px;
-            margin-top: 30px;
-        }
-        .contact-form {
-            background-color: white;
-            padding: 20px;
-            border: 1px solid #ddd;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        .contact-form input, .contact-form textarea {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        .contact-form button {
-            background-color: #333;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .contact-form button:hover {
-            background-color: #555;
-        }
-    </style>
+    <title>Tienda de Libros</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
     <header>
         <h1>Tienda de Libros</h1>
-        <p>Tu librería online de confianza</p>
+        <nav>
+            <a href="#" onclick="navigateTo('home')">Inicio</a>
+            <a href="#" onclick="navigateTo('login')">Ingresar</a>
+            <a href="#" onclick="navigateTo('register')">Registrarse</a>
+        </nav>
     </header>
-
-    <nav>
-        <a href="#">Inicio</a>
-        <a href="#">Libros Destacados</a>
-        <a href="#">Contacto</a>
-        <a href="#">Sobre Nosotros</a>
-    </nav>
-
-    <div class="container">
-        <h2>Libros Destacados</h2>
-        <div class="book-list">
-            <div class="book">
-                <img src="libro1.jpg" alt="Libro 1">
-                <h3>Título del Libro 1</h3>
-                <p>Autor: Nombre del Autor</p>
-                <p>Precio: $15.99</p>
-            </div>
-            <div class="book">
-                <img src="libro2.jpg" alt="Libro 2">
-                <h3>Título del Libro 2</h3>
-                <p>Autor: Nombre del Autor</p>
-                <p>Precio: $18.99</p>
-            </div>
-            <div class="book">
-                <img src="libro3.jpg" alt="Libro 3">
-                <h3>Título del Libro 3</h3>
-                <p>Autor: Nombre del Autor</p>
-                <p>Precio: $20.99</p>
-            </div>
-        </div>
-
-        <h2>Contacto</h2>
-        <div class="contact-form">
-            <form action="#">
-                <label for="name">Nombre:</label>
-                <input type="text" id="name" name="name" required>
-
-                <label for="email">Correo Electrónico:</label>
-                <input type="email" id="email" name="email" required>
-
-                <label for="message">Mensaje:</label>
-                <textarea id="message" name="message" rows="4" required></textarea>
-
-                <button type="submit">Enviar</button>
-            </form>
-        </div>
-    </div>
+    
+    <main id="app">
+        <!-- El contenido dinámico será cargado aquí -->
+    </main>
 
     <footer>
-        <p>&copy; 2024 Tienda de Libros - Todos los derechos reservados</p>
+        <p>&copy; 2024 Tienda de Libros</p>
     </footer>
 
+    <script src="app.js"></script>
 </body>
 </html>
