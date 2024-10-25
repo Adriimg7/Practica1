@@ -12,6 +12,16 @@ import { InvitadoIngresoPresenter } from "./components/invitado-ingreso/invitado
 import { ClienteHomePresenter } from "./components/cliente-home/cliente-home-presenter.mjs";
 import { AdminHomePresenter } from "./components/admin-home/admin-home-presenter.mjs";
 
+
+import { AdminModificarLibroPresenter } from "./components/admin-modificar-libro/admin-modificar-libro-presenter.mjs";
+
+
+
+
+
+
+
+
 export function init() {
   seed();
 
@@ -29,6 +39,6 @@ export function init() {
   router.register(/^\/libreria\/invitado-ver-libro.html/, new InvitadoVerLibroPresenter(model, 'invitado-ver-libro'));
   router.register(/^\/libreria\/admin-ver-libro.html/, new AdminVerLibroPresenter(model, 'admin-ver-libro'));
 
-
+  router.register(/^\/libreria\/admin-modificar-libro.html/, new AdminModificarLibroPresenter(model, 'admin-modificar-libro'));
   router.handleLocation();
 }
