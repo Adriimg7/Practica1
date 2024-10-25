@@ -12,6 +12,8 @@ import { InvitadoIngresoPresenter } from "./components/invitado-ingreso/invitado
 import { ClienteHomePresenter } from "./components/cliente-home/cliente-home-presenter.mjs";
 import { AdminHomePresenter } from "./components/admin-home/admin-home-presenter.mjs";
 import { ClienteComprarCarroPresenter } from "./components/cliente-comprar-carro/cliente-comprar-carro-presenter.mjs";
+import { ClienteCarroPresenter } from "./components/cliente-carro/cliente-carro-presenter.mjs";
+import { ClienteVerLibroPresenter } from "./components/cliente-ver-libro/cliente-ver-libro-presenter.mjs";
 
 export function init() {
   seed();
