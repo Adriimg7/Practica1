@@ -14,17 +14,22 @@ export class Libreria {
   libros = [];
   usuarios = [];
   facturas = [];
+  clienteActual = null;
   static lastId = 0;
 
   constructor() { }
 
+  setClienteActual(cliente){
+    this.clienteActual = cliente;
+  }
+
+  getClienteActual(){
+    return this.clienteActual;
+  }
+
   static genId() {
     return ++this.lastId;
   }
-
-  /**
-   * Libros
-   */
 
   getLibros() {
     return this.libros;
@@ -147,8 +152,10 @@ export class Libreria {
     else throw new Error('Rol no encontrado');
 
     if (!usuario) throw new Error('Usuario no encontrado');
-    else if (usuario.verificar(password)) return usuario;
-    else throw new Error('Error en la contraseña');
+    else if (usuario.verificar(password)) {
+      this.setClienteActual(usuario);
+      return usuario;
+    } else throw new Error('Error en la contraseña');
   }
 
   addClienteCarroItem(id, item) {
