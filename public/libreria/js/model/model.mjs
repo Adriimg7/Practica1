@@ -154,6 +154,7 @@ export class Libreria {
     if (!usuario) throw new Error('Usuario no encontrado');
     else if (usuario.verificar(password)) {
       this.setClienteActual(usuario);
+      console.log("Cliente autenticado", usuario);
       return usuario;
     } else throw new Error('Error en la contraseña');
   }
