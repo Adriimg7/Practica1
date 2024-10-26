@@ -16,7 +16,7 @@ import { ClienteCarroPresenter } from "./components/cliente-carro/cliente-carro-
 import { ClienteVerLibroPresenter } from "./components/cliente-ver-libro/cliente-ver-libro-presenter.mjs";
 import { AdminPerfilPresenter } from "./components/admin-perfil/admin-perfil-presenter.mjs";
 import { AdminModificarLibroPresenter } from "./components/admin-modificar-libro/admin-modificar-libro-presenter.mjs";
-
+import { ClientePerfilPresenter } from "./components/cliente-perfil/cliente-perfil-presenter.mjs";
 
 export function init() {
   seed();
@@ -40,6 +40,6 @@ export function init() {
 
   router.register(/^\/libreria\/admin-perfil.html$/, new AdminPerfilPresenter(model, 'admin-perfil'));
   router.register(/^\/libreria\/admin-modificar-libro.html/, new AdminModificarLibroPresenter(model, 'admin-modificar-libro'));
-
+  router.register(/^\/libreria\/cliente-perfil.html$/, new ClientePerfilPresenter(model, 'cliente-perfil'));
   router.handleLocation();
 }
