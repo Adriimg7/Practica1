@@ -1,4 +1,14 @@
-<header>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito de Compra</title>
+    <link rel="stylesheet" href="styles.css">
+    <script type="module" src="ClienteCarroPresenter.mjs"></script>
+</head>
+<body>
+  <header>
     <h1>Tecnologías y Sistemas Web 24/25</h1>
     <h2>Carrito de compra</h2>
   </header>
@@ -13,21 +23,36 @@
     </nav>
     <div class="contenido">
       <nav class="toolbar">
-        <!-- <ul>
-          <li><a id="homeLink" href="index.html">Inicio</a></li>
-          <li><a id="ingresoLink" href="ingreso.html">Ingreso</a></li>
-          <li><a id="registroLink" href="registro.html">Registro</a></li>
-        </ul> -->
+        <!-- Toolbar sin cambios, se mantiene el diseño -->
       </nav>
-      <main id="cliente-carro">
-        <h2>Carrito de compras</h2>
-        <div id="lista-libros"></div>
-        <div id="total"></div>
-        <button id="boton-comprar">Comprar</button>
-</main>
       <div class="info">
+        <!-- Contenedor de mensajes -->
         <div class="mensajes-container" id="mensajesContainer"></div>
-        <div id="catalogo" class="catalogo"></div>      
+        <!-- Tabla de libros en el carrito -->
+        <div id="catalogo" class="catalogo">
+          <h2>Carrito de compras</h2>
+          <table>
+              <thead>
+                  <tr>
+                      <th>Título</th>
+                      <th>Cantidad</th>
+                      <th>Precio Unitario</th>
+                      <th>Total</th>
+                  </tr>
+              </thead>
+              <tbody id="libros-contenido">
+                  <!-- Aquí se renderizarán los libros del carrito -->
+              </tbody>
+          </table>
+          <!-- Resumen de totales -->
+          <div id="total">
+              <p>Subtotal: <span id="subtotal"></span></p>
+              <p>IVA: <span id="iva"></span></p>
+              <p>Total: <span id="total-final"></span></p>
+          </div>
+          <!-- Botón de compra -->
+          <button id="boton-comprar">Comprar</button>
+        </div>
       </div>
       <footer>
         Prof. Dr. Ricardo Tesoriero Pszytula<br>
@@ -37,3 +62,25 @@
       </footer>
     </div>
   </article>
+
+  <!-- Script para inicializar y mostrar el carrito -->
+  <script type="module">
+    import { ClienteCarroPresenter } from './ClienteCarroPresenter.mjs';
+    import { model } from './model/model.mjs';
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const presenter = new ClienteCarroPresenter(model, "cliente-carro");
+        
+        // Muestra el contenido del carrito al cargar la página
+        presenter.mostrarCarrito();
+
+        // Agrega funcionalidad al botón "Comprar"
+        document.querySelector("#boton-comprar").addEventListener("click", () => {
+            alert("Compra realizada con éxito");
+            model.getClienteActual().getCarro().removeItems();  // Vacía el carrito
+            presenter.mostrarCarrito(); // Actualiza la vista del carrito
+        });
+    });
+  </script>
+</body>
+</html>
