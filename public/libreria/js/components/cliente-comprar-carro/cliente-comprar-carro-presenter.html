@@ -5,10 +5,9 @@
 <article>
   <nav class="navbar">
     <ul>
-      <li><a id="homeLink" href="cliente-home.html">Inicio</a></li>
-      <li><a id="carroLink" href="cliente-carro.html">Carro</a></li>
-      <li><a id="facturasLink" href="cliente-facturas.html">Facturas</a></li>
-      <li><a id="salirLink" href="home.html" onclick="console.log('Funciona?')">Salir</a></li>
+      <li><a id="homeLink" href="index.html">Inicio</a></li>
+      <li><a id="ingresoLink" href="invitado-ingreso.html">Ingreso</a></li>
+      <li><a id="registroLink" href="invitado-registro.html">Registro</a></li>
     </ul>
   </nav>
   <div class="contenido">
@@ -34,14 +33,18 @@
 
         <table>
           <thead>
-            <tr>
-              <th scope="col">Cant</th>
-              <th scope="col">Detalle</th>
-              <th scope="col">Unidad</th>
-              <th scope="col">Total</th>
-            </tr>
+              <tr>
+                  <th scope="col">Cant</th>
+                  <th scope="col">Detalle</th>
+                  <th scope="col">Unidad</th>
+                  <th scope="col">Total</th>
+              </tr>
           </thead>
-        </table>
+          <tbody id="lista-libros">
+             
+          </tbody>
+      </table>
+      
 
         <footer>
           <input id="ingresarInput" name="enviardksk" type="submit">
