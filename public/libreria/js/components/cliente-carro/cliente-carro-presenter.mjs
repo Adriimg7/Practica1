@@ -11,7 +11,6 @@ export class ClienteCarroPresenter extends Presenter {
   }
 
   async refresh(){
-
     await super.refresh();
     this.mostrarCarrito();
   }
@@ -28,42 +27,59 @@ export class ClienteCarroPresenter extends Presenter {
     }
 
     // Mostrar libros en el carrito
-     const listaLibros = document.querySelector("#lista-libros");
-    // listaLibros.innerHTML = carrito.items.map((item, index) => `
-    //   <div class="carrito-item">
-    //     <p><strong>${item.libro.titulo}</strong></p>
-    //     <p>Precio: $${item.libro.precio.toFixed(2)}</p>
-    //     <p>Cantidad: ${item.cantidad}</p>
-    //     <p>Total: $${item.total.toFixed(2)}</p>
-    //     <button onclick="borrarItem(${index})">Eliminar</button>
-    //   </div>
-    // `).join("");
-
-
+    const listaLibros = document.querySelector("#lista-libros");
     listaLibros.innerHTML = carrito.items.map((item, index) => {
-      // Convertir el precio a número si es necesario o manejar un valor predeterminado si es inválido
-      const precio = parseFloat(item.libro.precio) || 0; // Usa 0 si no es un número válido
-      const total = parseFloat(item.total) || 0;
-    
+      const precio = parseFloat(item.libro.precio) || 0;
+      const total = precio * item.cantidad;
+
       return `
-        <div class="carrito-item">
-          <p><strong>${item.libro.titulo}</strong></p>
-          <p>Precio: $${precio.toFixed(2)}</p>
-          <p>Cantidad: ${item.cantidad}</p>
-          <p>Total: $${total.toFixed(2)}</p>
-          <button onclick="borrarItem(${index})">Eliminar</button>
-        </div>
+        <tr>
+          <td>${item.libro.titulo}</td>
+          <td>
+            <input 
+              type="number" 
+              min="1" 
+              value="${item.cantidad}" 
+              onchange="presenter.actualizarCantidad(${index}, this.value)" 
+            />
+          </td>
+          <td>$${precio.toFixed(2)}</td>
+          <td>$${total.toFixed(2)}</td>
+        </tr>
       `;
     }).join("");
 
-
     // Mostrar totales
-   const totalContainer = document.querySelector("#total");
-   totalContainer.innerHTML = `
-     <p>Subtotal: $${carrito.subtotal.toFixed(2)}</p>
-      <p>IVA: $${carrito.iva.toFixed(2)}</p>
-      <p>Total: $${carrito.total.toFixed(2)}</p>
-    `;
+    this.actualizarTotales();
+  }
+
+  // Método para actualizar la cantidad de un libro en el carrito
+  actualizarCantidad(index, nuevaCantidad) {
+    const clienteActual = model.getClienteActual();
+    const carrito = clienteActual.getCarro();
+    const item = carrito.items[index];
+
+    // Actualizar la cantidad y el total del item
+    item.cantidad = parseInt(nuevaCantidad);
+    item.total = item.libro.precio * item.cantidad;
+
+    // Actualizar la vista del carrito y los totales
+    this.mostrarCarrito();
+  }
+
+  // Método para actualizar los totales en la vista
+  actualizarTotales() {
+    const clienteActual = model.getClienteActual();
+    const carrito = clienteActual.getCarro();
+
+    const subtotal = carrito.items.reduce((acc, item) => acc + item.libro.precio * item.cantidad, 0);
+    const iva = subtotal * 0.21;  // Suponiendo un IVA del 21%
+    const total = subtotal + iva;
+
+    // Actualizar los elementos del DOM con los valores
+    document.querySelector("#subtotal").textContent = `$${subtotal.toFixed(2)}`;
+    document.querySelector("#iva").textContent = `$${iva.toFixed(2)}`;
+    document.querySelector("#total-final").textContent = `$${total.toFixed(2)}`;
   }
 
   // Método para eliminar un libro del carrito
@@ -76,7 +92,7 @@ export class ClienteCarroPresenter extends Presenter {
 
 // Inicializar y cargar la vista del carrito
 document.addEventListener("DOMContentLoaded", () => {
-  const presenter = new ClienteCarroPresenter(model, "cliente-carro");
+  window.presenter = new ClienteCarroPresenter(model, "cliente-carro");
   presenter.mostrarCarrito();
   document.querySelector("#boton-comprar").addEventListener("click", () => {
     alert("Compra realizada con éxito");
