@@ -230,7 +230,6 @@ class Libro extends Identificable {
   }
 
   decStockN(n) {
-    if(n>this.stock) throw new Error('No hay suficiente stock');
     this.stock = this.stock - n;
   }
 
