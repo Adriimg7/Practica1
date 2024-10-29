@@ -86,7 +86,7 @@ export class ClienteComprarCarroPresenter extends Presenter {
 document.addEventListener("DOMContentLoaded", () => {
   window.presenter = new ClienteComprarCarroPresenter(model, "cliente-comprar-carro");
   presenter.mostrarCarrito();
-  document.querySelector("#ingresarInput").addEventListener("click", () => {
+  document.querySelector("#boton-pagar").addEventListener("click", () => {
     alert("Compra realizada con éxito");
     model.getClienteActual().getCarro().removeItems();
     presenter.mostrarCarrito(); // Refresca el carrito después de la compra
