@@ -93,10 +93,10 @@ export class ClienteCarroPresenter extends Presenter {
 // Inicializar y cargar la vista del carrito
 document.addEventListener("DOMContentLoaded", () => {
   window.presenter = new ClienteCarroPresenter(model, "cliente-carro");
-  presenter.mostrarCarrito();
-  document.querySelector("#boton-comprar").addEventListener("click", () => {
-    alert("Compra realizada con éxito");
-    model.getClienteActual().getCarro().removeItems();
-    presenter.mostrarCarrito(); // Refresca el carrito después de la compra
-  });
+  // presenter.mostrarCarrito();
+  // document.querySelector("#boton-comprar").addEventListener("click", () => {
+  //   alert("Compra realizada con éxito");
+  //   model.getClienteActual().getCarro().removeItems();
+  //   presenter.mostrarCarrito(); // Refresca el carrito después de la compra
+  // });
 });
