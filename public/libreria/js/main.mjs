@@ -17,7 +17,7 @@ import { ClienteVerLibroPresenter } from "./components/cliente-ver-libro/cliente
 import { AdminPerfilPresenter } from "./components/admin-perfil/admin-perfil-presenter.mjs";
 import { AdminModificarLibroPresenter } from "./components/admin-modificar-libro/admin-modificar-libro-presenter.mjs";
 import { ClientePerfilPresenter } from "./components/cliente-perfil/cliente-perfil-presenter.mjs";
-import { ClienteFacturasPresenter } from "./components/cliente-facturas/cliente-facturas.mjs";
+import { ClienteListaComprasPresenter } from "./components/cliente-lista-compras/cliente-lista-compras.mjs";
 import { ClienteVerCompraPresenter } from "./components/cliente-ver-compra/cliente-ver-compra.mjs";
 
 export function init() {
@@ -39,7 +39,7 @@ export function init() {
   router.register(/^\/libreria\/cliente-ver-libro.html/, new ClienteVerLibroPresenter(model, 'cliente-ver-libro'));
   router.register(/^\/libreria\/cliente-carro.html/, new ClienteCarroPresenter(model, 'cliente-carro'));
   router.register(/^\/libreria\/cliente-comprar-carro.html/, new ClienteComprarCarroPresenter(model, 'cliente-comprar-carro'));
-  router.register(/^\/libreria\/cliente-facturas.html/, new ClienteFacturasPresenter(model, 'cliente-facturas'));
+  router.register(/^\/libreria\/cliente-lista-compras.html/, new ClienteListaComprasPresenter(model, 'cliente-lista-compras'));
   router.register(/^\/libreria\/cliente-ver-compra.html/, new ClienteVerCompraPresenter(model, 'cliente-ver-compra'));
 
   router.register(/^\/libreria\/admin-perfil.html$/, new AdminPerfilPresenter(model, 'admin-perfil'));

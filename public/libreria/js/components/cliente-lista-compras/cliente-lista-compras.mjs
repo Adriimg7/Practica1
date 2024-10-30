@@ -5,17 +5,15 @@ import { model } from "../../model/model.mjs";
 import { ClienteCatalogoLibroPresenter } from "../cliente-catalogo-libro/cliente-catalogo-libro-presenter.mjs";
 import { MensajesPresenter } from "../mensajes/mensajes-presenter.mjs";
 
-export class ClienteFacturasPresenter extends Presenter {
+export class ClienteListaComprasPresenter extends Presenter {
     constructor(model, view) {
       super(model, view);
       this.mensajesPresenter = new MensajesPresenter(model, 'mensajes', '#mensajesContainer');
     }
-    async refresh()){
+    async refresh(){
       await super.refresh();
       this.cargarFacturas();
     }
-
-    
      cargarFacturas(){
       const clienteActual=model.getClienteActual();
 
@@ -70,4 +68,4 @@ export class ClienteFacturasPresenter extends Presenter {
      }
  }
  document.addEventListener("DOMContentLoaded", () => {
-   window.presenter = new ClienteFacturasPresenter(model, "cliente-facturas");})
+   window.presenter = new ClienteListaComprasPresenter(model, "cliente-lista-compras");})

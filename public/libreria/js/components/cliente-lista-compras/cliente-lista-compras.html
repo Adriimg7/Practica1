@@ -42,7 +42,7 @@
                   <th>Numero</th>
                   <th>Fecha</th>
                   <th>Total</th>
-                  <th>Ver</th>
+                  <th>Ver</th> 
                 </tr>
               </thead>
               <tbody id="lista-compras">
@@ -59,14 +59,11 @@
     </article>
   </main>
   <script type="module">
-    import { ClienteFacturasPresenter } from './ClienteFacturasPresenter.mjs';
+    import { ClienteListaComprasPresenter } from './ClienteListaComprasPresenter.mjs';
     import { model } from './model/model.mjs';
 
-    window.presenter = new ClienteFacturasPresenter(model, "cliente-facturas");
-
-    document.addEventListener("DOMContentLoaded", () => {
-      presenter.cargarFacturas();
-    });
+    window.presenter = new ClienteListaComprasPresenter(model, "cliente-lista-compras");
+    presenter.cargarFacturas();
   </script>
 </body>
 </html>
