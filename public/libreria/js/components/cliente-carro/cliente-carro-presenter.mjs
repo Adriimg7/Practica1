@@ -33,8 +33,7 @@ export class ClienteCarroPresenter extends Presenter {
       const total = precio * item.cantidad;
 
       return `
-        <tr>
-          <td>${item.libro.titulo}</td>
+        <tr> 
           <td>
             <input 
               type="number" 
@@ -43,6 +42,7 @@ export class ClienteCarroPresenter extends Presenter {
               onchange="presenter.actualizarCantidad(${index}, this.value)" 
             />
           </td>
+          <td>${item.libro.titulo}</td>
           <td>$${precio.toFixed(2)}</td>
           <td>$${total.toFixed(2)}</td>
         </tr>
