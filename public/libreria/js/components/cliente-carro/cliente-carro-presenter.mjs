@@ -34,7 +34,7 @@ export class ClienteCarroPresenter extends Presenter {
 
       return `
         <tr> 
-          <td>
+          <td align="center">
             <input 
               type="number" 
               min="1" 
@@ -42,9 +42,9 @@ export class ClienteCarroPresenter extends Presenter {
               onchange="presenter.actualizarCantidad(${index}, this.value)" 
             />
           </td>
-          <td>${item.libro.titulo}</td>
-          <td>$${precio.toFixed(2)}</td>
-          <td>$${total.toFixed(2)}</td>
+          <td align="center">${item.libro.titulo}</td>
+          <td align="center">$${precio.toFixed(2)}</td>
+          <td align="center">$${total.toFixed(2)}</td>
         </tr>
       `;
     }).join("");
