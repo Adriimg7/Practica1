@@ -10,11 +10,12 @@ export class ClienteFacturasPresenter extends Presenter {
       super(model, view);
       this.mensajesPresenter = new MensajesPresenter(model, 'mensajes', '#mensajesContainer');
     }
-    async refresh(){
+    async refresh()){
       await super.refresh();
       this.cargarFacturas();
     }
 
+    
      cargarFacturas(){
       const clienteActual=model.getClienteActual();
 

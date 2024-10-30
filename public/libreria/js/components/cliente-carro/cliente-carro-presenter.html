@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Carrito de compra</title>
-  <link rel="stylesheet" href="estilo.css"> <!-- Verifica que el enlace al archivo CSS sea correcto -->
+  <link rel="stylesheet" href="estilo.css"> 
 </head>
 <body>
   <main>
@@ -86,7 +86,7 @@
       // Funcionalidad del botón "Comprar"
       document.querySelector("#boton-comprar").addEventListener("click", () => {
         alert("Compra realizada con éxito");
-        model.getClienteActual().getCarro().removeItems();  // Vacía el carrito
+        //model.getClienteActual().getCarro().removeItems();  // Vacía el carrito
         presenter.mostrarCarrito(); // Actualiza la vista del carrito
       });
     });
