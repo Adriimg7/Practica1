@@ -3,20 +3,19 @@
   "version": "1.0.0",
   "main": "app.mjs",
   "scripts": {
-  "test": "mocha public/libreria/js/test/**/*.spec.mjs --reporter spec"
-}
-,
+    "test": ".\\node_modules\\.bin\\mocha .\\test\\**\\*.spec.mjs --reporter spec",
+    "start": "node ."
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "chai": "^5.1.2",
-    "mocha": "^10.8.2"
+    "chai": "^5.1.1",
+    "mocha": "^10.7.3"
   },
   "dependencies": {
     "express": "^4.21.1",
     "path": "^0.12.7"
   }
 }
-
