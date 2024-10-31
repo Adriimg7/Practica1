@@ -4,7 +4,6 @@ import { router } from "../../commons/router.mjs";
 import { model } from "../../model/model.mjs";
 import { ClienteCatalogoLibroPresenter } from "../cliente-catalogo-libro/cliente-catalogo-libro-presenter.mjs";
 import { MensajesPresenter } from "../mensajes/mensajes-presenter.mjs";
-import { ClienteCarroPresenter } from "../cliente-carro/cliente-carro-presenter.mjs";
 
 export class ClienteComprarCarroPresenter extends Presenter {
   constructor(model, view) {

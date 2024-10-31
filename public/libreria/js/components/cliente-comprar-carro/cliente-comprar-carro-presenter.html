@@ -32,8 +32,8 @@
 
         <label for="emailInput">Email</label>
         <input id="emailInput" name="email" type="email" placeholder="Ingrese su correo electrónico" required><br>
-        <div id="carritoContainer">
-        <table> 
+
+        <table>
           <thead>
               <tr>
                   <th scope="col">Cant</th>
@@ -45,14 +45,9 @@
           <tbody id="lista-libros">
              
           </tbody>
-        </div>
       </table>
-      <!-- Resumen de totales -->
-      <div id="total" style="text-align: right; margin-top: 20px;">
-        <p>Subtotal: €<span id="subtotal">0.00</span></p>
-        <p>IVA: €<span id="iva">0.00</span></p>
-        <p>Total: €<span id="total-final">0.00</span></p>
-      </div>
+      
+
         <footer>
           <button id="boton-pagar" onclick="location.href='cliente-home.html'">Comprar</button>
         </footer>
@@ -66,20 +61,4 @@
     </footer>
   </div>
 </article>
-<script type="module">
-  import { ClienteComprarCarroPresenter } from './ClienteComprarCarroPresenter.mjs';
-  import { model } from './model/model.mjs';
 
-
-  document.addEventListener("DOMContentLoaded", () => {
-    window.presenter = new ClienteComprarCarroPresenter(model, "cliente-comprar-carro");
-    presenter.mostrarCarrito();
-
-    // Funcionalidad del botón "Comprar"
-    document.querySelector("#boton-pagar").addEventListener("click", () => {
-      alert("Compra realizada con éxito");
-      model.getClienteActual().getCarro().removeItems();  // Vacía el carrito
-      presenter.mostrarCarrito(); // Actualiza la vista del carrito
-    });
-  });
-</script>
