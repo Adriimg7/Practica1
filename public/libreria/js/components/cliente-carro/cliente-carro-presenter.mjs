@@ -1,24 +1,19 @@
-import { libreriaSession } from "../../commons/libreria-session.mjs";
 import { Presenter } from "../../commons/presenter.mjs";
-import { router } from "../../commons/router.mjs";
 import { model } from "../../model/model.mjs";
-import { ClienteCatalogoLibroPresenter } from "../cliente-catalogo-libro/cliente-catalogo-libro-presenter.mjs";
-import { MensajesPresenter } from "../mensajes/mensajes-presenter.mjs";
+import { libreriaSession } from "../../commons/libreria-session.mjs";
 
 export class ClienteCarroPresenter extends Presenter {
   constructor(model, view) {
     super(model, view);
   }
 
-  async refresh(){
+  async refresh() {
     await super.refresh();
     this.mostrarCarrito();
   }
 
-  // Método para cargar los datos del carrito en la vista
   mostrarCarrito() {
-    const clienteActual = model.getClienteActual();
-    const carrito = clienteActual?.getCarro();
+    const carrito = libreriaSession.getCarrito();
 
     if (!carrito || carrito.items.length === 0) {
       document.querySelector("#lista-libros").innerHTML = "<p>El carrito está vacío</p>";
@@ -26,77 +21,52 @@ export class ClienteCarroPresenter extends Presenter {
       return;
     }
 
-    // Mostrar libros en el carrito
     const listaLibros = document.querySelector("#lista-libros");
     listaLibros.innerHTML = carrito.items.map((item, index) => {
-      const precio = parseFloat(item.libro.precio) || 0;
+      const precio = item.precio;
       const total = precio * item.cantidad;
-
       return `
-        <tr> 
+        <tr>
           <td align="center">
             <input 
               type="number" 
               min="1" 
               value="${item.cantidad}" 
-              onchange="presenter.actualizarCantidad(${index}, this.value)" 
+              onchange="presenter.actualizarCantidad('${item.id}', this.value)" 
             />
           </td>
-          <td align="center">${item.libro.titulo}</td>
-          <td align="center">$${precio.toFixed(2)}</td>
-          <td align="center">$${total.toFixed(2)}</td>
+          <td align="center">${item.titulo}</td>
+          <td align="center">${libreriaSession.formatearMoneda(precio)}</td>
+          <td align="center">${libreriaSession.formatearMoneda(total)}</td>
         </tr>
       `;
     }).join("");
 
-    // Mostrar totales
     this.actualizarTotales();
   }
 
-  // Método para actualizar la cantidad de un libro en el carrito
-  actualizarCantidad(index, nuevaCantidad) {
-    const clienteActual = model.getClienteActual();
-    const carrito = clienteActual.getCarro();
-    const item = carrito.items[index];
-
-    // Actualizar la cantidad y el total del item
-    item.cantidad = parseInt(nuevaCantidad);
-    item.total = item.libro.precio * item.cantidad;
-
-    // Actualizar la vista del carrito y los totales
+  actualizarCantidad(id, cantidad) {
+    libreriaSession.actualizarCantidadEnCarrito(id, parseInt(cantidad));
     this.mostrarCarrito();
   }
 
-  // Método para actualizar los totales en la vista
   actualizarTotales() {
-    const clienteActual = model.getClienteActual();
-    const carrito = clienteActual.getCarro();
-
-    const subtotal = carrito.items.reduce((acc, item) => acc + item.libro.precio * item.cantidad, 0);
-    const iva = subtotal * 0.21;  // Suponiendo un IVA del 21%
+    const carrito = libreriaSession.getCarrito();
+    const subtotal = carrito.items.reduce((acc, item) => acc + item.precio * item.cantidad, 0);
+    const iva = subtotal * 0.21;
     const total = subtotal + iva;
 
-    // Actualizar los elementos del DOM con los valores
-    document.querySelector("#subtotal").textContent = `$${subtotal.toFixed(2)}`;
-    document.querySelector("#iva").textContent = `$${iva.toFixed(2)}`;
-    document.querySelector("#total-final").textContent = `$${total.toFixed(2)}`;
+    document.querySelector("#subtotal").textContent = libreriaSession.formatearMoneda(subtotal);
+    document.querySelector("#iva").textContent = libreriaSession.formatearMoneda(iva);
+    document.querySelector("#total-final").textContent = libreriaSession.formatearMoneda(total);
   }
 
-  // Método para eliminar un libro del carrito
-  borrarItem(index) {
-    const clienteActual = model.getClienteActual();
-    clienteActual.borrarCarroItem(index);
-    this.mostrarCarrito();  // Actualizar la vista después de eliminar
+  borrarItem(id) {
+    libreriaSession.eliminarDelCarrito(id);
+    this.mostrarCarrito();
   }
 }
 
-// Inicializar y cargar la vista del carrito
 document.addEventListener("DOMContentLoaded", () => {
   window.presenter = new ClienteCarroPresenter(model, "cliente-carro");
-  // presenter.mostrarCarrito();
-  // document.querySelector("#boton-comprar").addEventListener("click", () => {
-  //   alert("Compra realizada con éxito");
-  //   model.getClienteActual().getCarro().removeItems();
-  //   presenter.mostrarCarrito(); // Refresca el carrito después de la compra
-  // });
 });

@@ -1,95 +1,75 @@
-import { libreriaSession } from "../../commons/libreria-session.mjs";
 import { Presenter } from "../../commons/presenter.mjs";
-import { router } from "../../commons/router.mjs";
-import { model } from "../../model/model.mjs";
-import { ClienteCatalogoLibroPresenter } from "../cliente-catalogo-libro/cliente-catalogo-libro-presenter.mjs";
-import { MensajesPresenter } from "../mensajes/mensajes-presenter.mjs";
+import { libreriaSession } from "../../commons/libreria-session.mjs";
 
 export class ClienteComprarCarroPresenter extends Presenter {
   constructor(model, view) {
-    super(model, view); 
+    super(model, view);
   }
 
-  async refresh(){
+  async refresh() {
     await super.refresh();
+    this.cargarDatosCliente();
     this.mostrarCarrito();
   }
 
-  // Método para cargar los datos del carrito en la vista
+  cargarDatosCliente() {
+    const cliente = libreriaSession.getClienteActual();
+
+    if (cliente) {
+      document.querySelector("#dniInput").value = cliente.dni || "";
+      document.querySelector("#razonsocialInput").value = cliente.razonSocial || "";
+      document.querySelector("#direccionInput").value = cliente.direccion || "";
+      document.querySelector("#emailInput").value = cliente.email || "";
+    } else {
+      console.error("Cliente no encontrado en la sesión.");
+    }
+  }
+
   mostrarCarrito() {
-    const clienteActual = model.getClienteActual();
-    const carrito = clienteActual?.getCarro();
+    const carrito = libreriaSession.getCarrito();
 
     if (!carrito || carrito.items.length === 0) {
       document.querySelector("#lista-libros").innerHTML = "<p>El carrito está vacío</p>";
-      document.querySelector("#total").innerHTML = "";
       return;
     }
 
-    // Mostrar libros en el carrito
     const listaLibros = document.querySelector("#lista-libros");
-    listaLibros.innerHTML = carrito.items.map((item, index) => {
-      const precio = parseFloat(item.libro.precio) || 0;
-      const total = precio * item.cantidad;
-
+    listaLibros.innerHTML = carrito.items.map(item => {
+      const total = item.cantidad * item.precio;
       return `
         <tr>
-          <td>${item.libro.titulo}</td>
-          <td>
-            <input 
-              type="number" 
-              min="1" 
-              value="${item.cantidad}" 
-              onchange="presenter.actualizarCantidad(${index}, this.value)" 
-            />
-          </td>
-          <td>$${precio.toFixed(2)}</td>
-          <td>$${total.toFixed(2)}</td>
+          <td>${item.cantidad}</td>
+          <td>${item.titulo}</td>
+          <td>${libreriaSession.formatearMoneda(item.precio)}</td>
+          <td>${libreriaSession.formatearMoneda(total)}</td>
         </tr>
       `;
     }).join("");
 
-    // Mostrar totales
     this.actualizarTotales();
   }
 
-  // Método para actualizar la cantidad de un libro en el carrito
-  actualizarCantidad(index, nuevaCantidad) {
-    const clienteActual = model.getClienteActual();
-    const carrito = clienteActual.getCarro();
-    const item = carrito.items[index];
-
-    // Actualizar la cantidad y el total del item
-    item.cantidad = parseInt(nuevaCantidad);
-    item.total = item.libro.precio * item.cantidad;
-
-    // Actualizar la vista del carrito y los totales
-    this.mostrarCarrito();
-  }
-
-  // Método para actualizar los totales en la vista
   actualizarTotales() {
-    const clienteActual = model.getClienteActual();
-    const carrito = clienteActual.getCarro();
-
-    const subtotal = carrito.items.reduce((acc, item) => acc + item.libro.precio * item.cantidad, 0);
-    const iva = subtotal * 0.21;  // Suponiendo un IVA del 21%
+    const carrito = libreriaSession.getCarrito();
+    const subtotal = carrito.items.reduce((acc, item) => acc + item.cantidad * item.precio, 0);
+    const iva = subtotal * 0.21;
     const total = subtotal + iva;
 
-    // Actualizar los elementos del DOM con los valores
-    document.querySelector("#subtotal").textContent = `$${subtotal.toFixed(2)}`;
-    document.querySelector("#iva").textContent = `$${iva.toFixed(2)}`;
-    document.querySelector("#total-final").textContent = `$${total.toFixed(2)}`;
+    document.querySelector("#subtotal").textContent = libreriaSession.formatearMoneda(subtotal);
+    document.querySelector("#iva").textContent = libreriaSession.formatearMoneda(iva);
+    document.querySelector("#total-final").textContent = libreriaSession.formatearMoneda(total);
   }
-  
+
+  realizarCompra() {
+    alert("Compra realizada con éxito");
+    libreriaSession.vaciarCarrito();
+    this.mostrarCarrito();
+  }
 }
+
 document.addEventListener("DOMContentLoaded", () => {
   window.presenter = new ClienteComprarCarroPresenter(model, "cliente-comprar-carro");
-  presenter.mostrarCarrito();
   document.querySelector("#boton-pagar").addEventListener("click", () => {
-    alert("Compra realizada con éxito");
-    model.getClienteActual().getCarro().removeItems();
-    presenter.mostrarCarrito(); // Refresca el carrito después de la compra
+    presenter.realizarCompra();
   });
 });
-

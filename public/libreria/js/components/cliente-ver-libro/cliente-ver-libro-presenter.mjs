@@ -1,6 +1,8 @@
+// ClienteVerLibroPresenter.mjs
+
 import { Presenter } from "../../commons/presenter.mjs";
-import { router } from "../../commons/router.mjs";
 import { model } from "../../model/model.mjs";
+import { libreriaSession } from "../../commons/libreria-session.mjs";
 
 export class ClienteVerLibroPresenter extends Presenter {
   constructor(model, view) {
@@ -15,56 +17,27 @@ export class ClienteVerLibroPresenter extends Presenter {
     return this.searchParams.get('id');
   }
 
-  // para acceder al modelo, siempre con métodos, no con getters!
   getLibro() {
     return model.getLibroPorId(this.id);
   }
 
-  get isbnParagraph() {
-    console.log(document);
-    return document.querySelector('#isbnParagraph');
-  }
+  get isbnParagraph() { return document.querySelector('#isbnParagraph'); }
+  set isbn(isbn) { this.isbnParagraph.textContent = isbn; }
 
-  set isbn(isbn) {
-    this.isbnParagraph.textContent = isbn;
-  }
-  get tituloParagraph() {
-    return document.querySelector('#tituloParagraph');
-  }
+  get tituloParagraph() { return document.querySelector('#tituloParagraph'); }
+  set titulo(titulo) { this.tituloParagraph.textContent = titulo; }
 
-  set titulo(titulo) {
-    this.tituloParagraph.textContent = titulo;
-  }
-  get autoresParagraph() {
-    return document.querySelector('#autoresParagraph');
-  }
+  get autoresParagraph() { return document.querySelector('#autoresParagraph'); }
+  set autores(autores) { this.autoresParagraph.textContent = autores; }
 
-  set autores(autores) {
-    this.autoresParagraph.textContent = autores;
-  }
+  get resumenParagraph() { return document.querySelector('#resumenParagraph'); }
+  set resumen(resumen) { this.resumenParagraph.textContent = resumen; }
 
-  get resumenParagraph() {
-    return document.querySelector('#resumenParagraph');
-  }
+  get precioParagraph() { return document.querySelector('#precioParagraph'); }
+  set precio(precio) { this.precioParagraph.textContent = libreriaSession.formatearMoneda(precio); }
 
-  set resumen(resumen) {
-    this.resumenParagraph.textContent = resumen;
-  }
-  get precioParagraph() {
-    return document.querySelector('#precioParagraph');
-  }
-
-  set precio(precio) {
-    this.precioParagraph.textContent = precio;
-  }
-
-  get stockParagraph() {
-    return document.querySelector('#stockParagraph');
-  }
-
-  set stock(stock) {
-    this.stockParagraph.textContent = stock;
-  }
+  get stockParagraph() { return document.querySelector('#stockParagraph'); }
+  set stock(stock) { this.stockParagraph.textContent = stock; }
 
   set libro(libro) {    
     this.isbn = libro.isbn;
@@ -77,47 +50,36 @@ export class ClienteVerLibroPresenter extends Presenter {
 
   agregarAlCarrito(event) {
     event.preventDefault();
-    let libro = this.getLibro();
+    const libro = this.getLibro();
+
     if (!libro || libro.stock <= 0) {
       alert('No hay suficiente stock de este libro.');
       return;
     }
-  
-    let cliente = model.getClienteActual();
-    if (!cliente) {
+
+    if (libreriaSession.esInvitado()) {
       alert('Por favor, inicie sesión para agregar al carrito.');
       return;
     }
-  
-    cliente.addCarroItem({
-      libro: libro,
-      cantidad: 1
-    });
-  
-    // Reducir stock del libro
-    libro.decStockN(1);
-  
+
+    // Crear el item con todas las propiedades necesarias para identificación única
+    const item = {
+      id: libro.id,
+      titulo: libro.titulo,
+      precio: libro.precio,
+      cantidad: 1 // Añadimos uno por cada vez que se llame a agregarAlCarrito
+    };
+
+    libreriaSession.agregarAlCarrito(item); // Agregar el libro al carrito
     alert(`El libro "${libro.titulo}" ha sido agregado al carrito.`);
   }
-  
 
   async refresh() {
     await super.refresh();
-    console.log(this.id);
-    let libro = this.getLibro();
+    const libro = this.getLibro();
     if (libro) this.libro = libro;
-    else console.error(`Libro ${id} not found!`);
+    else console.error(`Libro ${this.id} no encontrado!`);
 
-    let self = this;
-    document.querySelector('#agregarCarritoButton').onclick = function (event) {
-      self.agregarAlCarrito(event);
-    };
-    
-
-    // cuidado no asignar directamente el método, se pierde this!
-    // document.querySelector('#agregarButton').onclick = event => this.agregarClick(event);
-    // let self = this;
-    // document.querySelector('#agregarButton').onclick = function (event) { self.agregarClick(event) };
+    document.querySelector('#agregarCarritoButton').onclick = (event) => this.agregarAlCarrito(event);
   }
-
 }
