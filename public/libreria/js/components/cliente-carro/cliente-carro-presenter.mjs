@@ -27,9 +27,10 @@ export class ClienteCarroPresenter extends Presenter {
       const total = precio * item.cantidad;
       return `
         <tr>
-          <td align="center">
+          <td>
             <input 
-              type="number" 
+              type="number"
+              name="cantidad" 
               min="1" 
               value="${item.cantidad}" 
               onchange="presenter.actualizarCantidad('${item.id}', this.value)" 

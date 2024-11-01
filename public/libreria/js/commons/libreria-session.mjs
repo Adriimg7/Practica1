@@ -71,13 +71,14 @@ class LibreriaSession {
     const item = carrito.items.find(libro => libro.id === itemId);
 
     if (item) {
-      item.cantidad = cantidad > 0 ? cantidad : 0; // Asegurar que la cantidad no sea negativa
+      item.cantidad = parseInt(cantidad);
       if (item.cantidad === 0) {
         // Eliminar el libro si la cantidad es cero
         this.eliminarDelCarrito(itemId);
       } else {
         this.setCarrito(carrito); // Actualizar el carrito en sessionStorage
       }
+      
     }
   }
 

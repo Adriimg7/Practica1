@@ -1,5 +1,6 @@
 import { Presenter } from "../../commons/presenter.mjs";
 import { libreriaSession } from "../../commons/libreria-session.mjs";
+import { model } from "../../model/model.mjs";
 
 export class ClienteComprarCarroPresenter extends Presenter {
   constructor(model, view) {
