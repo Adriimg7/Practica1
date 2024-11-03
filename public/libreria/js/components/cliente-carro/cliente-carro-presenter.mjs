@@ -14,6 +14,7 @@ export class ClienteCarroPresenter extends Presenter {
 
   mostrarCarrito() {
     const carrito = libreriaSession.getCarrito();
+    console.log("Carrito cargado en mostrarCarrito:", carrito);
 
     if (!carrito || carrito.items.length === 0) {
       document.querySelector("#lista-libros").innerHTML = "<p>El carrito está vacío</p>";
@@ -23,6 +24,7 @@ export class ClienteCarroPresenter extends Presenter {
 
     const listaLibros = document.querySelector("#lista-libros");
     listaLibros.innerHTML = carrito.items.map((item, index) => {
+      console.log("Renderizando item con ID:", item.id);
       const precio = item.precio;
       const total = precio * item.cantidad;
       return `
@@ -47,9 +49,33 @@ export class ClienteCarroPresenter extends Presenter {
   }
 
   actualizarCantidad(id, cantidad) {
-    libreriaSession.actualizarCantidadEnCarrito(id, parseInt(cantidad));
+    // console.log("Actualizando cantidad para el item ID:", id, "a:", cantidad);
+    // cantidad = parseInt(cantidad, 10);
+    
+    // if (isNaN(cantidad) || cantidad <= 0) {
+    //   alert("La cantidad debe ser un número válido mayor que 0.");
+    //   return;
+
+    if (!id) {
+      console.error("No se recibió un ID válido para actualizar la cantidad.");
+      return;
+    }
+  
+    console.log("Actualizando cantidad para el item ID:", id, "a:", cantidad);
+  
+    cantidad = parseInt(cantidad, 10);
+    
+    if (isNaN(cantidad) || cantidad <= 0) {
+      alert("La cantidad debe ser un número válido mayor que 0.");
+      return;
+    }
+  
+    libreriaSession.actualizarCantidadEnCarrito(id, cantidad);
+    console.log("Carrito después de actualizar:", libreriaSession.getCarrito());
     this.mostrarCarrito();
-  }
+
+
+    }
 
   actualizarTotales() {
     const carrito = libreriaSession.getCarrito();

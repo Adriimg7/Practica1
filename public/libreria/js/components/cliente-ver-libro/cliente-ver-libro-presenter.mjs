@@ -61,17 +61,25 @@ export class ClienteVerLibroPresenter extends Presenter {
       alert('Por favor, inicie sesión para agregar al carrito.');
       return;
     }
-
+    if (!libro._id) {
+      console.error("El libro no tiene un ID:", libro);
+      alert('Error: el libro no tiene un ID válido.');
+      return;
+    }
+    console.log(libro);
+    console.log("ID del libro:", libro._id);
     // Crear el item con todas las propiedades necesarias para identificación única
     const item = {
-      id: libro.id,
+      id: libro._id,
       titulo: libro.titulo,
       precio: libro.precio,
       cantidad: 1 // Añadimos uno por cada vez que se llame a agregarAlCarrito
     };
+    console.log("Item a agregar al carrito:", item);
 
     libreriaSession.agregarAlCarrito(item); // Agregar el libro al carrito
     alert(`El libro "${libro.titulo}" ha sido agregado al carrito.`);
+    console.log("Carrito después de agregar:", libreriaSession.getCarrito());
   }
 
   async refresh() {

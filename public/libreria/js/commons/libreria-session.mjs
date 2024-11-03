@@ -50,6 +50,10 @@ class LibreriaSession {
   agregarAlCarrito(item) {
     const carrito = this.getCarrito();
 
+    if (!item.id) {
+      console.error("El item no tiene ID:", item);
+      return; // Salir si el item no tiene un ID válido
+    }
     // Buscar el libro por ID, título y precio para asegurar que es el mismo item exacto
     const itemExistente = carrito.items.find(
       libro => libro.id === item.id && libro.titulo === item.titulo && libro.precio === item.precio
@@ -68,7 +72,9 @@ class LibreriaSession {
 
   actualizarCantidadEnCarrito(itemId, cantidad) {
     const carrito = this.getCarrito();
-    const item = carrito.items.find(libro => libro.id === itemId);
+    console.log("Carrito actual:", carrito);
+    console.log("Buscando item con ID:", itemId);
+    const item = carrito.items.find(libro => libro.id === parseInt(itemId));
 
     if (item) {
       item.cantidad = parseInt(cantidad);
@@ -78,7 +84,8 @@ class LibreriaSession {
       } else {
         this.setCarrito(carrito); // Actualizar el carrito en sessionStorage
       }
-      
+    } else {
+      console.error("Item no encontrado en el carrito:", itemId);
     }
   }
 
