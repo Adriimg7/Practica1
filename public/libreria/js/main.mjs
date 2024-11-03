@@ -17,8 +17,8 @@ import { ClienteVerLibroPresenter } from "./components/cliente-ver-libro/cliente
 import { AdminPerfilPresenter } from "./components/admin-perfil/admin-perfil-presenter.mjs";
 import { AdminModificarLibroPresenter } from "./components/admin-modificar-libro/admin-modificar-libro-presenter.mjs";
 import { ClientePerfilPresenter } from "./components/cliente-perfil/cliente-perfil-presenter.mjs";
-import { ClienteFacturasPresenter } from "./components/cliente-facturas/cliente-facturas.mjs";
-import { ClienteVerCompraPresenter } from "./components/cliente-ver-compra/cliente-ver-compra.mjs";
+import { ClienteFacturasPresenter } from "./components/cliente-facturas/cliente-facturas-presenter.mjs";
+import { ClienteVerCompraPresenter } from "./components/cliente-ver-compra/cliente-ver-compra-presenter.mjs";
 
 export function init() {
   seed();
