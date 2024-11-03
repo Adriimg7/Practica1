@@ -18,7 +18,7 @@ export class ClienteComprarCarroPresenter extends Presenter {
 
     if (cliente) {
       document.querySelector("#dniInput").value = cliente.dni || "";
-      document.querySelector("#razonsocialInput").value = cliente.razonSocial || "";
+      // Dejamos que el usuario edite el campo "Razón Social", sin asignarlo desde el cliente.
       document.querySelector("#direccionInput").value = cliente.direccion || "";
       document.querySelector("#emailInput").value = cliente.email || "";
     } else {
@@ -63,8 +63,8 @@ export class ClienteComprarCarroPresenter extends Presenter {
 
   realizarCompra() {
     alert("Compra realizada con éxito");
-    libreriaSession.vaciarCarrito();
-    this.mostrarCarrito();
+    libreriaSession.vaciarCarrito(); // Vacía el carrito después de la compra
+    this.mostrarCarrito(); // Refresca el carrito para mostrar que está vacío
   }
 }
 
