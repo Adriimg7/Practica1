@@ -1,0 +1,68 @@
+<header>
+    <h1>Tecnologías y Sistemas Web 24/25</h1>
+    <h2>Cliente Ver Libro</h2>
+  </header>
+  <article>
+    <nav class="navbar">
+      <ul>
+        <li><a id="homeLink" href="cliente-home.html">Inicio</a></li>
+        <li><a id="carroLink" href="cliente-carro.html">Carro</a></li>
+        <li><a id="facturasLink" href="cliente-facturas.html">Facturas</a></li>
+        <li><a id="salirLink" href="home.html" onclick="console.log('Funciona?')">Salir</a></li>
+      </ul>
+    </nav>
+    <div class="contenido">
+      <div class="info">
+        <div class="mensajes-container" id="mensajesContainer"></div>
+        <div id="detalle" class="detalle">
+          <div>
+            <label for="numero">Numero:</label>
+            <p id="numero"></p>
+          </div>
+          <div>
+            <label for="fecha">Fecha:</label>
+            <p id="fecha"></p>
+          </div>
+          <div>
+            <label for="razonSocial">Razon social:</label>
+            <p id="razonSocial"></p>
+          </div>
+          <div>
+            <label for="dni">DNI</label>
+            <p id="dni"></p>
+          </div>
+          <div>
+            <label for="direccion">Direccion:</label>
+            <p id="direccion"> </p>
+          </div>
+          <div>
+            <label for="email">Email</label>
+            <p id="email"></p>
+          </div>
+          <table class="carro">
+            <thead>
+                <tr>
+                  <th>Cantidad</th>
+                  <th>Detalle</th>
+                  <th>Unidad</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody id="lista-libros">
+                
+              </tbody>
+          </table>
+          <div id="total" style="text-align: right; margin-top: 20px;">
+            <p>IVA: €<span id="iva">0.00</span></p>
+            <p>Total: €<span id="total-final">0.00</span></p>
+          </div>
+        </div>
+      </div>
+      <footer>
+        Prof. Dr. Ricardo Tesoriero Pszytula<br>
+        Tecnologías y Sistemas Web 24/25<br>
+        Universidad de Castilla-La Mancha<br>
+        <small>20 de septiembre de 2021</small>
+      </footer>
+    </div>
+  </article>
