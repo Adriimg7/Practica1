@@ -248,29 +248,121 @@ app.delete('/api/clientes/:id', (req, res) => {
     }
 });
 
-// Actualizar un cliente
 app.put('/api/clientes/:id', (req, res) => {
     try {
-        const cliente = model.getClientePorId(req.params.id);
-        if (!cliente) return res.status(404).json({ error: 'Cliente no encontrado' });
-
-        Object.assign(cliente, req.body);
-        model.updateCliente(cliente);
-        res.json(cliente);
-    } catch (err) {
-        res.status(400).json({ error: err.message });
+      const id = req.params.id; // Obtener el ID del cliente de la URL
+      const data = req.body; // Obtener los datos que quieres actualizar desde el cuerpo de la solicitud
+      const clienteActualizado = model.updateCliente(id, data); // Llamar al método updateCliente
+      res.json(clienteActualizado); // Devolver el cliente actualizado como respuesta
+    } catch (error) {
+      res.status(400).json({ error: error.message }); // Si hay algún error, devolver un mensaje de error
     }
-});
+  });
+  
 
-// Autenticar cliente
-app.post('/api/clientes/autenticar', (req, res) => {
+  app.post('/api/clientes/autenticar', (req, res) => {
     try {
-        const usuario = model.autenticar(req.body);
-        res.json(usuario);
-    } catch (err) {
-        res.status(401).json({ error: err.message });
+        const { email, password, rol } = req.body; // Obtener los datos del cliente desde el cuerpo de la solicitud
+
+        if (!email || !password || !rol) {
+            return res.status(400).json({ error: 'Correo, contraseña y rol son obligatorios' });
+        }
+
+        // Llamar al método autenticar del modelo
+        const clienteAutenticado = model.autenticar({ email, password, rol });
+        res.json(clienteAutenticado); // Devolver el cliente autenticado como respuesta
+    } catch (error) {
+        res.status(400).json({ error: error.message }); // Si ocurre algún error, devolverlo
     }
 });
+app.post('/api/clientes/signin', (req, res) => {
+    try {
+        const { email, password, rol } = req.body; // Obtener los datos del cliente desde el cuerpo de la solicitud
+
+        if (!email || !password || !rol) {
+            return res.status(400).json({ error: 'Correo, contraseña y rol son obligatorios' });
+        }
+
+        // Llamar al método autenticar del modelo
+        const clienteAutenticado = model.autenticar({ email, password, rol });
+        res.json(clienteAutenticado); // Devolver el cliente autenticado como respuesta
+    } catch (error) {
+        res.status(400).json({ error: error.message }); // Si ocurre algún error, devolverlo
+    }
+});
+// ------------------- RUTA PARA OBTENER EL CARRO DE UN CLIENTE -------------------
+app.get('/api/clientes/:id/carro', (req, res) => {
+    const clienteId = req.params.id;  // Obtener el ID del cliente de la URL
+    
+    try {
+        // Llamada a la función que obtiene el carro del cliente desde el modelo
+        const carro = model.getCarroCliente(clienteId);
+        
+        if (!carro) {
+            return res.status(404).json({ error: 'Carro no encontrado para este cliente' });
+        }
+        
+        // Si se encuentra el carro, se devuelve en la respuesta
+        res.json(carro);
+    } catch (err) {
+        res.status(500).json({ error: err.message }); // Manejo de errores en caso de excepción
+    }
+});
+// ------------------- RUTA PARA AGREGAR UN ITEM AL CARRO DE UN CLIENTE -------------------
+app.post('/api/clientes/:id/carro/items', (req, res) => {
+    const clienteId = parseInt(req.params.id); // Obtener el ID del cliente desde la URL
+    const nuevoItem = req.body; // Obtener el item del cuerpo de la solicitud
+
+    try {
+        // Verificar que el item contiene el ID del libro
+        if (!nuevoItem || !nuevoItem.libro) {
+            return res.status(400).json({ error: 'El item debe contener un ID de libro' });
+        }
+
+        // Obtener el libro por su ID
+        const libro = model.getLibroPorId(nuevoItem.libro);
+        if (!libro) {
+            return res.status(404).json({ error: 'Libro no encontrado' });
+        }
+
+        // Llamamos al modelo para agregar el item al carro del cliente
+        const itemActualizado = model.addClienteCarroItem(clienteId, nuevoItem);
+
+        if (!itemActualizado) {
+            return res.status(404).json({ error: 'No se encontró el cliente o el carro no existe' });
+        }
+
+        // Si todo está bien, devolvemos el item actualizado
+        res.status(201).json(itemActualizado); // Estado 201 indica que se ha creado un recurso
+    } catch (error) {
+        res.status(500).json({ error: error.message }); // Error general en el servidor
+    }
+});
+
+app.put('/api/clientes/:id/carro/items/:index', (req, res) => {
+    const clienteId = parseInt(req.params.id); // ID del cliente desde la URL
+    const itemIndex = parseInt(req.params.index); // Índice del ítem en el carro
+    const { cantidad } = req.body; // Nueva cantidad desde el cuerpo de la solicitud
+
+    try {
+        // Validar que la cantidad sea un número válido y mayor que 0
+        if (isNaN(cantidad) || cantidad <= 0) {
+            return res.status(400).json({ error: 'La cantidad debe ser un número mayor que 0' });
+        }
+
+        // Llamar al método del modelo para actualizar la cantidad del ítem
+        const itemActualizado = model.setClienteCarroItemCantidad(clienteId, itemIndex, cantidad);
+
+        
+
+        // Devolver el ítem actualizado como respuesta
+        res.json(itemActualizado);
+    } catch (error) {
+        console.error('Error al actualizar el ítem en el carro:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+
 
 // ------------------- RUTAS PARA ADMINISTRADORES -------------------
 

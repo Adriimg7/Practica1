@@ -165,6 +165,49 @@ getClientePorEmail(email) {
 getClientePorDni(dni) {
   return this.usuarios.find(u => u.rol === ROL.CLIENTE && u.dni === dni);  // Use this.usuarios
 }
+// Función para eliminar un cliente por su ID
+removeCliente(id) {
+  // Buscar el índice del cliente por su ID
+  const index = this.usuarios.findIndex(cliente => cliente._id === parseInt(id));
+  
+  // Si no se encuentra el cliente, lanzar un error
+  if (index === -1) {
+      throw new Error("Cliente no encontrado");
+  }
+  
+  // Eliminar el cliente de la lista de usuarios
+  const clienteEliminado = this.usuarios.splice(index, 1); // Elimina el cliente
+  
+  // Retornar el cliente eliminado
+  return clienteEliminado[0]; 
+}
+// Función para actualizar un cliente por su ID
+updateCliente(id, data) {
+  // Buscar al cliente por su ID
+  const cliente = this.getClientePorId(id); // Usamos el método ya existente getClientePorId
+  if (!cliente) {
+    throw new Error("Cliente no encontrado"); // Si no existe el cliente, lanzamos un error
+  }
+
+  // Actualizar solo los campos proporcionados en el objeto `data`
+  Object.assign(cliente, data); // Asignamos los nuevos valores a las propiedades del cliente
+
+  // Devolver el cliente actualizado
+  return cliente;
+}
+autenticar(obj) {
+    let email = obj.email;
+    let password = obj.password;
+    let usuario;
+
+    if (obj.rol === ROL.CLIENTE) usuario = this.getClientePorEmail(email);
+    else if (obj.rol === ROL.ADMIN) usuario = this.getAdministradorPorEmail(email);
+    else throw new Error('Rol no encontrado');
+
+    if (!usuario) throw new Error('Usuario no encontrado');
+    else if (usuario.verificar(password)) return usuario;
+    else throw new Error('Error en la contraseña');
+}
 
   addAdmin(obj) {
     let admin = new Administrador();
@@ -227,15 +270,36 @@ getClientePorDni(dni) {
   }
 
   addClienteCarroItem(id, item) {
+    // Obtener el cliente por su ID
+    const cliente = this.getClientePorId(id);
+    if (!cliente) {
+        return null; // Si el cliente no existe, devolvemos null
+    }
+
+    // Obtener el libro a partir del ID proporcionado en el item
     item.libro = this.getLibroPorId(item.libro);
-    item = this.getClientePorId(id).addCarroItem(item);
+    if (!item.libro) {
+        return null; // Si no se encuentra el libro, devolvemos null
+    }
+
+    // Asegurarse de que el cliente tiene un carro
+    if (!cliente.carro) {
+        cliente.carro = { items: [] }; // Si no tiene carro, inicializamos uno vacío
+    }
+
+    // Agregar el nuevo item al carro del cliente
+    cliente.carro.items.push(item);
+
+    // Devolvemos el item agregado al carro (puedes devolver el carro completo si prefieres)
     return item;
-  }
+}
+
 
   setClienteCarroItemCantidad(id, index, cantidad) {
     let cliente = this.getClientePorId(id);
     return cliente.setCarroItemCantidad(index, cantidad);
   }
+  
 
   getCarroCliente(id) {
     return this.getClientePorId(id).carro;
@@ -436,7 +500,7 @@ class Carro {
     else {
       let item = this.items[index];
       item.cantidad = cantidad;
-      item.calcular();
+      
     }
     this.calcular();
   }
