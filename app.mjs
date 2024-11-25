@@ -30,22 +30,37 @@ app.get('/api/libros', (req, res) => {
 app.put('/api/libros', (req, res) => {
     try {
         const libros = req.body;
-        model.setLibros(libros); // Asignamos el array de libros
-        res.status(200).json(libros);
+
+        // Verificar si el cuerpo es un array
+        if (!Array.isArray(libros)) {
+            return res.status(400).json({ error: "Se esperaba un array de libros" });
+        }
+
+        // Asegurarnos de que cada libro tenga las propiedades necesarias
+        libros.forEach(libro => {
+            if (!libro.id || !libro.isbn || !libro.titulo || !libro.autor || !libro.precio) {
+                return res.status(400).json({ error: "El libro debe contener id, isbn, titulo, autor y precio" });
+            }
+        });
+
+        // Si todo está bien, actualizamos los libros en el modelo
+        model.setLibros(libros);
+        res.status(200).json(libros);  // Devuelve los libros actualizados
     } catch (err) {
         res.status(400).json({ error: err.message });
     }
 });
 
-// Eliminar todos los libros
+// DELETE /api/libros - Eliminar todos los libros
 app.delete('/api/libros', (req, res) => {
     try {
-        const librosEliminados = model.removeLibros();
-        res.json(librosEliminados);
+        const librosEliminados = model.removeLibros(); // Llama a removeLibros para eliminar todos los libros
+        res.status(200).json(librosEliminados); // Devuelve los libros eliminados
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
+
 
 // Crear un nuevo libro
 app.post('/api/libros', (req, res) => {
@@ -57,28 +72,45 @@ app.post('/api/libros', (req, res) => {
     }
 });
 
-// Obtener un libro por ID
+// Ruta para obtener un libro por su ID
 app.get('/api/libros/:id', (req, res) => {
     try {
-        const libro = model.getLibroPorId(req.params.id);
-        if (!libro) return res.status(404).json({ error: 'Libro no encontrado' });
-        res.json(libro);
+        const libroId = req.params.id; // ID pasado en la URL
+        const libro = model.getLibroPorId(libroId); // Busca el libro por el ID
+
+        if (!libro) {
+            return res.status(404).json({ error: 'Libro no encontrado' });
+        }
+
+        res.json(libro); // Si se encuentra el libro, lo devuelve
     } catch (err) {
         res.status(500).json({ error: err.message });
+    }
+});
+app.get('/api/libros', (req, res) => {
+    try {
+        const { isbn } = req.query; // Obtener el parámetro 'isbn' de la consulta
+        console.log('ISBN recibido:', isbn);
+
+        if (!isbn) {
+            return res.status(400).json({ error: 'El ISBN es obligatorio' }); // Validación de parámetros
+        }
+
+        const libro = model.getLibroPorIsbn(isbn); // Llamar al método del modelo
+
+        if (!libro) {
+            return res.status(404).json({ error: `No se encontró ningún libro con ISBN ${isbn}` }); // Libro no encontrado
+        }
+
+        res.json(libro); // Respuesta con el libro encontrado
+    } catch (err) {
+        console.error('Error al procesar la solicitud:', err.message);
+        res.status(500).json({ error: 'Error interno del servidor' }); // Manejo de errores generales
     }
 });
 
-// Buscar un libro por ISBN
-app.get('/api/libros', (req, res) => {
-    const { isbn } = req.query;
-    try {
-        const libro = model.getLibroPorIsbn(isbn);
-        if (!libro) return res.status(404).json({ error: 'Libro no encontrado' });
-        res.json(libro);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
+
+
 
 // Buscar un libro por título
 app.get('/api/libros', (req, res) => {
@@ -102,19 +134,31 @@ app.delete('/api/libros/:id', (req, res) => {
     }
 });
 
-// Actualizar un libro por ID
 app.put('/api/libros/:id', (req, res) => {
     try {
-        const libro = model.getLibroPorId(req.params.id);
-        if (!libro) return res.status(404).json({ error: 'Libro no encontrado' });
+        const { id } = req.params; // Obtener el ID del libro desde la URL
+        const data = req.body; // Obtener los datos a actualizar del cuerpo de la solicitud
 
-        Object.assign(libro, req.body);
-        model.updateLibro(libro);
-        res.json(libro);
+        if (!id) {
+            return res.status(400).json({ error: 'El ID es obligatorio' }); // Validación del ID
+        }
+
+        if (!data || Object.keys(data).length === 0) {
+            return res.status(400).json({ error: 'Los datos de actualización son obligatorios' }); // Validación de datos
+        }
+
+        const libroActualizado = model.updateLibro(Number(id), data); // Llamada al modelo
+
+        res.json(libroActualizado); // Respuesta con el libro actualizado
     } catch (err) {
-        res.status(400).json({ error: err.message });
+        console.error('Error al actualizar el libro:', err.message);
+        if (err.message.includes('No se encontró')) {
+            return res.status(404).json({ error: err.message }); // Error si el libro no existe
+        }
+        res.status(500).json({ error: 'Error interno del servidor' }); // Error genérico
     }
 });
+
 
 // ------------------- RUTAS PARA CLIENTES -------------------
 

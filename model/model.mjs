@@ -36,7 +36,12 @@ export class Libreria {
     array.forEach((l) => { this.addLibro(l) })
     return this.libros;
   }
-
+  // Método para eliminar todos los libros
+  removeLibros() {
+    const librosEliminados = [...this.libros]; // Guardamos todos los libros eliminados
+    this.libros = []; // Vaciamos la lista de libros
+    return librosEliminados; // Retornamos los libros eliminados
+  }
   addLibro(obj) {
     if (!obj.isbn) throw new Error('El libro no tiene ISBN');
     if (this.getLibroPorIsbn(obj.isbn)) throw new Error(`El ISBN ${obj.isbn} ya existe`)
@@ -47,13 +52,25 @@ export class Libreria {
     return libro;
   }
 
-  getLibroPorId(id) {
-    return this.libros.find((v) => v._id == id);
-  }
+// Método para obtener un libro por su ID
+getLibroPorId(id) {
+  const numericId = Number(id); // Convierte el id de la URL en un número
+  return this.libros.find((v) => v._id === numericId); // Comparación estricta
+}
 
-  getLibroPorIsbn(isbn) {
-    return this.libros.find((v) => v.isbn == isbn);
-  }
+
+getLibroPorIsbn(isbn) {
+  if (!isbn) throw new Error('El ISBN es obligatorio');
+  const isbnString = String(isbn).trim(); // Asegurarse de que el ISBN sea tratado como string y sin espacios
+  
+  const libro = this.libros.find((libro) => libro.isbn === isbnString);
+  return libro || null; // Retornar el libro encontrado o null si no existe
+}
+
+
+
+
+
 
   getLibroPorTitulo(titulo) {
     titulo = titulo.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -70,11 +87,23 @@ export class Libreria {
   }
 
 
-  updateLibro(obj) {
-    let libro = this.getLibroPorId(obj._id);
-    Object.assign(libro, obj);
-    return libro;
-  }
+  updateLibro(id, data) {
+    if (!id) throw new Error('El ID es obligatorio para actualizar un libro');
+    const libroIndex = this.libros.findIndex((libro) => libro._id === id);
+
+    if (libroIndex === -1) {
+        throw new Error(`No se encontró ningún libro con el ID ${id}`);
+    }
+
+    // Actualizar solo los campos proporcionados
+    this.libros[libroIndex] = {
+        ...this.libros[libroIndex], // Mantener los campos existentes
+        ...data,                   // Sobrescribir con los datos proporcionados
+    };
+
+    return this.libros[libroIndex]; // Devolver el libro actualizado
+}
+
 
   /**
    * Usuario
