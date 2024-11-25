@@ -544,15 +544,50 @@ app.post('/api/admins/signin', (req, res) => {
 
 // ------------------- RUTAS PARA FACTURAS -------------------
 
-// Obtener todas las facturas
+// Obtener todas las facturas o buscar por número o cliente
 app.get('/api/facturas', (req, res) => {
     try {
-        const facturas = model.getFacturas();
+        const { numero, cliente } = req.query; // Obtener los parámetros de consulta
+
+        if (numero) { // Si se pasa el número de factura
+            const factura = model.getFacturaPorNumero(numero);
+            if (!factura || factura.length === 0) {
+                return res.status(404).json({ error: `No se encontró ninguna factura con número ${numero}` });
+            }
+            return res.json(factura); // Devuelve la(s) factura(s) encontrada(s) por número
+        }
+
+        if (cliente) { // Si se pasa el ID del cliente
+            const facturas = model.getFacturasPorCliente(cliente);
+            if (!facturas || facturas.length === 0) {
+                return res.status(404).json({ error: `No se encontraron facturas para el cliente con ID ${cliente}` });
+            }
+            return res.json(facturas); // Devuelve las facturas encontradas para el cliente
+        }
+
+        const facturas = model.getFacturas(); // Si no se pasa ningún parámetro, devuelve todas las facturas
         res.json(facturas);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
+
+// Obtener una factura por su ID
+app.get('/api/facturas/:id', (req, res) => {
+    try {
+        const facturaId = req.params.id; // ID pasado en la URL
+        const factura = model.getFacturaPorId(facturaId); // Busca la factura por el ID
+
+        if (!factura || factura.length === 0) {
+            return res.status(404).json({ error: `No se encontró ninguna factura con ID ${facturaId}` });
+        }
+
+        res.json(factura); // Si se encuentra la factura, la devuelve
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 
 // Crear una factura
 app.post('/api/facturas', (req, res) => {
@@ -563,17 +598,49 @@ app.post('/api/facturas', (req, res) => {
         res.status(400).json({ error: err.message });
     }
 });
-
-// Obtener una factura por ID
-app.get('/api/facturas/:id', (req, res) => {
+// Ruta para reemplazar todas las facturas
+app.put('/api/facturas', (req, res) => {
     try {
-        const factura = model.getFacturaPorId(req.params.id);
-        if (!factura) return res.status(404).json({ error: 'Factura no encontrada' });
-        res.json(factura);
+        const facturas = req.body; // Obtener el array de facturas del cuerpo de la solicitud
+
+        // Validar que el cuerpo contiene un array
+        if (!Array.isArray(facturas)) {
+            return res.status(400).json({ error: "Se esperaba un array de facturas" });
+        }
+
+        // Llamar al método setFacturas del modelo
+        const facturasActualizadas = model.setFacturas(facturas);
+        res.status(200).json(facturasActualizadas); // Responder con las facturas actualizadas
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(400).json({ error: err.message }); // Manejo de errores
     }
 });
+
+app.delete('/api/facturas', (req, res) => {
+    try {
+        const facturasEliminadas = model.removeFacturas(); // Llama al método del modelo
+        res.status(200).json(facturasEliminadas); // Responder con las facturas eliminadas
+    } catch (err) {
+        res.status(500).json({ error: err.message }); // Manejo de errores
+    }
+});
+// Ruta para crear una nueva factura
+app.post('/api/facturas', (req, res) => {
+    try {
+        const { cliente } = req.body; // Extraer el cliente del cuerpo de la solicitud
+
+        if (!cliente) {
+            return res.status(400).json({ error: "El ID del cliente es obligatorio" });
+        }
+
+        // Llamar al método del modelo para crear una factura
+        const nuevaFactura = model.facturarCompraCliente(req.body);
+        res.status(201).json(nuevaFactura); // Responder con la factura creada
+    } catch (err) {
+        res.status(400).json({ error: err.message }); // Manejo de errores
+    }
+});
+
 
 // Iniciar el servidor
 app.listen(PORT, () => {

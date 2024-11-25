@@ -378,32 +378,101 @@ getAdminPorId(id) {
    * Factura
    */
 
-  getFacturas() {
-    return this.facturas;
+ // Obtener todas las facturas
+ getFacturas() {
+  return this.facturas;
+}
+
+// Obtener una factura por su ID
+getFacturaPorId(id) {
+  const numericId = Number(id);
+  return this.facturas.find(factura => factura._id === numericId) || null;
+}
+
+// Obtener facturas por número
+getFacturaPorNumero(numero) {
+  if (!numero) throw new Error("El número de factura es obligatorio");
+  const numeroString = String(numero).trim(); // Asegurar que sea string
+  return this.facturas.filter(factura => factura.numero === numeroString);
+}
+
+// Obtener facturas por cliente
+getFacturasPorCliente(clienteId) {
+  if (!clienteId) throw new Error("El ID del cliente es obligatorio");
+  const numericClienteId = Number(clienteId);
+  return this.facturas.filter(factura => factura.cliente && factura.cliente._id === numericClienteId);
+}
+setFacturas(array) {
+  if (!Array.isArray(array)) {
+      throw new Error("El parámetro debe ser un array de facturas");
   }
 
-  getFacturaPorId(id) {
-    return this.facturas.filter((f) => f._id == id);
+  // Validación de las propiedades mínimas de cada factura
+  array.forEach(factura => {
+      if (
+          !factura._id ||
+          !factura.numero ||
+          !factura.cliente ||
+          !factura.items ||
+          !factura.total
+      ) {
+          throw new Error("Cada factura debe tener _id, numero, cliente, items y total");
+      }
+  });
+
+  // Reemplaza las facturas actuales por las nuevas
+  this.facturas = array;
+  return this.facturas;
+}
+removeFacturas() {
+  const facturasEliminadas = [...this.facturas]; // Crear una copia de las facturas eliminadas
+  this.facturas = []; // Vaciar la lista de facturas
+  return facturasEliminadas; // Retornar las facturas eliminadas
+}
+facturarCompraCliente(obj) {
+  if (!obj || !obj.cliente) {
+      throw new Error("Cliente no definido");
   }
 
-  getFacturaPorNumero(numero) {
-    return this.facturas.filter((f) => f.numero == numero);
+  // Buscar al cliente por su ID
+  const cliente = this.getClientePorId(obj.cliente);
+  if (!cliente) {
+      throw new Error("Cliente no encontrado");
   }
 
-  facturarCompraCliente(obj) {
-    if (!obj.cliente) throw new Error('Cliente no definido');
-    let cliente = this.getClientePorId(obj.cliente);
-    if (cliente.getCarro().items.length < 1) throw new Error('No hay que comprar');
-    let factura = new Factura();
-    Object.assign(factura, obj)
-    factura.assignId();
-    factura.assignNumero();
-    factura.cliente = new Cliente();
-    Object.assign(factura.cliente, cliente);
-    delete factura.cliente.carro;
-    Object.assign(factura, cliente.carro);
-    cliente.removeItems();
+  // Validar que el cliente tiene ítems en su carrito
+  if (!cliente.carro || cliente.carro.items.length === 0) {
+      throw new Error("El carrito del cliente está vacío");
   }
+
+  // Crear la factura
+  const factura = new Factura();
+  factura.assignId(); // Generar un ID único
+  factura.numero = `F-${Date.now()}`; // Generar un número de factura único
+  factura.fecha = new Date();
+  factura.cliente = { 
+      _id: cliente._id,
+      dni: cliente.dni,
+      nombre: cliente.nombre,
+      email: cliente.email
+  };
+  factura.items = [...cliente.carro.items]; // Copiar los ítems del carrito a la factura
+  factura.subtotal = cliente.carro.subtotal;
+  factura.iva = cliente.carro.iva;
+  factura.total = cliente.carro.total;
+
+  // Vaciar el carrito del cliente después de facturar
+  cliente.carro.items = [];
+  cliente.carro.subtotal = 0;
+  cliente.carro.iva = 0;
+  cliente.carro.total = 0;
+
+  // Agregar la factura a la lista de facturas
+  this.facturas.push(factura);
+
+  return factura; // Retornar la factura creada
+}
+
 
   removeFactura(id) {
     let factura = this.getFacturaPorId(id);
