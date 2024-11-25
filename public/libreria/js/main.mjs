@@ -1,5 +1,5 @@
-//
-import { model } from "./model/proxy.mjs";
+ 
+import { model } from "./model/model.mjs";
 import { seed } from "./model/seeder.mjs";
 import { router } from "./commons/router.mjs";
 import { InvitadoHomePresenter } from "./components/invitado-home/invitado-home-presenter.mjs";

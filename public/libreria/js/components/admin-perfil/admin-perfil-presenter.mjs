@@ -1,5 +1,5 @@
 import { Presenter } from "../../commons/presenter.mjs";
-import { model } from "../../model/proxy.mjs";
+import { model } from "../../model/model.mjs";
 import { router } from "../../commons/router.mjs";
 import { libreriaSession } from "../../commons/libreria-session.mjs";
 import { MensajesPresenter } from "../mensajes/mensajes-presenter.mjs";

@@ -1,5 +1,5 @@
 import { Presenter } from "../../commons/presenter.mjs";
-import { model } from "../../model/proxy.mjs";
+import { model } from "../../model/model.mjs";
 import { libreriaSession } from "../../commons/libreria-session.mjs";
 
 export class ClienteCarroPresenter extends Presenter {

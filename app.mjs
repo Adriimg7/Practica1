@@ -11,13 +11,17 @@ seed(); // Inicializa los datos
 const STATIC_DIR = url.fileURLToPath(new URL('.', import.meta.url)); // Ruta base de archivos estáticos
 const PORT = 3000; // Puerto para el servidor
 const app = express(); // Instancia del servidor
-
+app.use('/', express.static(path.join(STATIC_DIR, 'public')));
 // Middleware para parsear JSON y URL encoded
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ------------------- RUTAS PARA LIBROS -------------------
-
+app.use('/libreria*', (req, res) => {
+    res.sendFile(path.join(STATIC_DIR, 'public/libreria/index.html'));
+  });
+  
+ 
 // Obtener todos los libros
 app.get('/api/libros', (req, res) => {
     try {
