@@ -116,16 +116,28 @@ getLibroPorIsbn(isbn) {
       this.addAdmin(obj);
     else throw new Error('Rol desconocido');
   }
+  removeClientes() {
+    // Vaciar el array de usuarios (clientes y administradores)
+    this.usuarios = this.usuarios.filter(u => u.rol !== ROL.CLIENTE); // Elimina solo los clientes
+    return { message: 'Todos los clientes han sido eliminados' }; // Mensaje de éxito
+}
 
-  addCliente(obj) {
-    let cliente = this.getClientePorEmail(obj.email);
-    if (cliente) throw new Error('Correo electrónico registrado');
-    cliente = new Cliente();
-    Object.assign(cliente, obj);
-    cliente.assignId();
-    this.usuarios.push(cliente);
-    return cliente;
+
+addCliente(obj) {
+  // Verificar si ya existe un cliente con el mismo email
+  let clienteExistente = this.getClientePorEmail(obj.email);
+  if (clienteExistente) {
+      throw new Error('Correo electrónico ya registrado');
   }
+
+  // Crear una nueva instancia de Cliente
+  let cliente = new Cliente();
+  Object.assign(cliente, obj); // Asignar los datos del objeto al cliente
+  cliente.assignId(); // Asignar un ID único al cliente
+  this.usuarios.push(cliente); // Agregar el cliente a la lista de usuarios
+  return cliente; // Devolver el cliente recién creado
+}
+
   setClientes(array) {
     if (!Array.isArray(array)) {
         throw new Error('El parámetro debe ser un array'); // Validar que el parámetro sea un array
@@ -140,6 +152,11 @@ getLibroPorIsbn(isbn) {
 
     this.clientes = array; // Reemplaza la lista de clientes actual por la nueva
     return this.clientes; // Retorna la lista actualizada de clientes
+}
+getClientePorId(id) {
+  // Buscar al cliente por su ID en la lista de usuarios
+  const cliente = this.usuarios.find(u => u.rol === ROL.CLIENTE && u._id === id);
+  return cliente || null; // Retorna el cliente encontrado o null si no existe
 }
 
 

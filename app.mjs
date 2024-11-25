@@ -192,36 +192,47 @@ app.put('/api/clientes', (req, res) => {
 });
 
 
-// Eliminar todos los clientes
 app.delete('/api/clientes', (req, res) => {
     try {
-        const clientesEliminados = model.removeClientes();
-        res.json(clientesEliminados);
+        // Llamamos al método removeClientes para eliminar todos los clientes
+        const resultado = model.removeClientes(); 
+
+        // Devolvemos la respuesta con los clientes eliminados
+        res.json(resultado); 
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error('Error al eliminar los clientes:', err.message);
+        res.status(500).json({ error: 'Error interno del servidor' }); // Error en el servidor
     }
 });
 
-// Crear un nuevo cliente
+
 app.post('/api/clientes', (req, res) => {
     try {
+        // Obtener el objeto del cliente desde el cuerpo de la solicitud
         const nuevoCliente = model.addCliente(req.body);
-        res.status(201).json(nuevoCliente);
+        res.status(201).json(nuevoCliente); // Devuelve el cliente recién creado con estado 201 (Creado)
     } catch (err) {
-        res.status(400).json({ error: err.message });
+        res.status(400).json({ error: err.message }); // Si ocurre un error, se devuelve el mensaje de error
     }
 });
 
-// Obtener un cliente por ID
+
+
 app.get('/api/clientes/:id', (req, res) => {
     try {
-        const cliente = model.getClientePorId(req.params.id);
-        if (!cliente) return res.status(404).json({ error: 'Cliente no encontrado' });
-        res.json(cliente);
+        const clienteId = req.params.id; // Obtener el ID del cliente desde la URL
+        const cliente = model.getClientePorId(clienteId); // Llamar al método del modelo
+
+        if (!cliente) {
+            return res.status(404).json({ error: 'Cliente no encontrado' }); // Si el cliente no existe
+        }
+
+        res.json(cliente); // Si se encuentra el cliente, lo devolvemos
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: err.message }); // Manejo de errores generales
     }
 });
+
 
 // Buscar cliente por email
 app.get('/api/clientes', (req, res) => {
