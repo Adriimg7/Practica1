@@ -1,6 +1,6 @@
 // libreria-session.mjs
 
-import { ROL } from "../model/model.mjs";
+import { ROL } from "../model/proxy.mjs";
 
 const USUARIO_ID = 'USUARIO_ID';
 const USUARIO_ROL = 'USUARIO_ROL';

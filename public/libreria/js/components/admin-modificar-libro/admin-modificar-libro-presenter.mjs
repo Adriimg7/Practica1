@@ -1,5 +1,5 @@
 import { Presenter } from "../../commons/presenter.mjs";
-import { model } from "../../model/model.mjs";
+import { model } from "../../model/proxy.mjs";
 import { router } from "../../commons/router.mjs";
 
 export class AdminModificarLibroPresenter extends Presenter {

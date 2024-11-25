@@ -1,6 +1,6 @@
 import { Presenter } from "../../commons/presenter.mjs";
 // import { Router } from "../../commons/router.mjs";
-import { model } from "../../model/model.mjs";
+import { model } from "../../model/proxy.mjs";
 
 export class InvitadoVerLibroPresenter extends Presenter {
   constructor(model, view) {

@@ -1,6 +1,6 @@
 import { mensajes } from "../../commons/mensajes.mjs";
 import { Presenter } from "../../commons/presenter.mjs";
-import { model } from "../../model/model.mjs";
+import { model } from "../../model/proxy.mjs";
 import { InvitadoCatalogoLibroPresenter } from "../invitado-catalogo-libro/invitado-catalogo-libro-presenter.mjs";
 import { MensajesPresenter } from "../mensajes/mensajes-presenter.mjs";
 

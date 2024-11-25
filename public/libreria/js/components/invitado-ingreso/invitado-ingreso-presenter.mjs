@@ -1,7 +1,7 @@
 import { Presenter } from "../../commons/presenter.mjs";
 import { router } from "../../commons/router.mjs";
 import { libreriaSession } from "../../commons/libreria-session.mjs";
-import { ROL } from "../../model/model.mjs";
+import { ROL } from "../../model/proxy.mjs";
 import { MensajesPresenter } from "../mensajes/mensajes-presenter.mjs";
 
 export class InvitadoIngresoPresenter extends Presenter {
