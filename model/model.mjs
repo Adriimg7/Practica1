@@ -126,6 +126,22 @@ getLibroPorIsbn(isbn) {
     this.usuarios.push(cliente);
     return cliente;
   }
+  setClientes(array) {
+    if (!Array.isArray(array)) {
+        throw new Error('El parámetro debe ser un array'); // Validar que el parámetro sea un array
+    }
+
+    // Asegúrate de que todos los objetos en el array sean clientes válidos
+    array.forEach(cliente => {
+        if (!cliente.id || !cliente.nombre || !cliente.email) {
+            throw new Error('El cliente debe tener un id, nombre y email');
+        }
+    });
+
+    this.clientes = array; // Reemplaza la lista de clientes actual por la nueva
+    return this.clientes; // Retorna la lista actualizada de clientes
+}
+
 
   addAdmin(obj) {
     let admin = new Administrador();

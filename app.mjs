@@ -175,13 +175,22 @@ app.get('/api/clientes', (req, res) => {
 // Establecer los clientes (actualizar toda la lista de clientes)
 app.put('/api/clientes', (req, res) => {
     try {
-        const clientes = req.body;
-        model.setClientes(clientes); // Asignamos el array de clientes
-        res.status(200).json(clientes);
+        const arrayClientes = req.body; // Obtener el array de clientes desde el cuerpo de la solicitud
+
+        if (!arrayClientes || !Array.isArray(arrayClientes)) {
+            return res.status(400).json({ error: 'El cuerpo debe contener un array de clientes' });
+        }
+
+        // Llamar al método setClientes para actualizar la lista
+        const clientesActualizados = model.setClientes(arrayClientes);
+
+        res.json(clientesActualizados); // Responder con la lista de clientes actualizada
     } catch (err) {
-        res.status(400).json({ error: err.message });
+        console.error('Error al actualizar los clientes:', err.message);
+        res.status(500).json({ error: 'Error interno del servidor' }); // Manejo de errores
     }
 });
+
 
 // Eliminar todos los clientes
 app.delete('/api/clientes', (req, res) => {
