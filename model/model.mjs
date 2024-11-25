@@ -158,7 +158,13 @@ getClientePorId(id) {
   const cliente = this.usuarios.find(u => u.rol === ROL.CLIENTE && u._id === id);
   return cliente || null; // Retorna el cliente encontrado o null si no existe
 }
+getClientePorEmail(email) {
+  return this.usuarios.find(u => u.rol === ROL.CLIENTE && u.email === email);  // Use this.usuarios
+}
 
+getClientePorDni(dni) {
+  return this.usuarios.find(u => u.rol === ROL.CLIENTE && u.dni === dni);  // Use this.usuarios
+}
 
   addAdmin(obj) {
     let admin = new Administrador();

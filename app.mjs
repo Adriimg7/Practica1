@@ -19,7 +19,25 @@ app.use(express.urlencoded({ extended: true }));
 // Obtener todos los libros
 app.get('/api/libros', (req, res) => {
     try {
-        const libros = model.getLibros();
+        const { isbn, titulo } = req.query; // Obtener los parámetros de consulta
+
+        if (isbn) { // Si se pasa el ISBN
+            const libro = model.getLibroPorIsbn(isbn);
+            if (!libro) {
+                return res.status(404).json({ error: `No se encontró ningún libro con ISBN ${isbn}` });
+            }
+            return res.json(libro); // Devuelve el libro encontrado por ISBN
+        }
+
+        if (titulo) { // Si se pasa el título
+            const libro = model.getLibroPorTitulo(titulo);
+            if (!libro) {
+                return res.status(404).json({ error: 'Libro no encontrado' });
+            }
+            return res.json(libro); // Devuelve el libro encontrado por título
+        }
+
+        const libros = model.getLibros(); // Si no se pasa ningún parámetro, devuelve todos los libros
         res.json(libros);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -87,42 +105,7 @@ app.get('/api/libros/:id', (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
-app.get('/api/libros', (req, res) => {
-    try {
-        const { isbn } = req.query; // Obtener el parámetro 'isbn' de la consulta
-        console.log('ISBN recibido:', isbn);
 
-        if (!isbn) {
-            return res.status(400).json({ error: 'El ISBN es obligatorio' }); // Validación de parámetros
-        }
-
-        const libro = model.getLibroPorIsbn(isbn); // Llamar al método del modelo
-
-        if (!libro) {
-            return res.status(404).json({ error: `No se encontró ningún libro con ISBN ${isbn}` }); // Libro no encontrado
-        }
-
-        res.json(libro); // Respuesta con el libro encontrado
-    } catch (err) {
-        console.error('Error al procesar la solicitud:', err.message);
-        res.status(500).json({ error: 'Error interno del servidor' }); // Manejo de errores generales
-    }
-});
-
-
-
-
-// Buscar un libro por título
-app.get('/api/libros', (req, res) => {
-    const { titulo } = req.query;
-    try {
-        const libro = model.getLibroPorTitulo(titulo);
-        if (!libro) return res.status(404).json({ error: 'Libro no encontrado' });
-        res.json(libro);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
 
 // Eliminar un libro por ID
 app.delete('/api/libros/:id', (req, res) => {
@@ -162,10 +145,30 @@ app.put('/api/libros/:id', (req, res) => {
 
 // ------------------- RUTAS PARA CLIENTES -------------------
 
-// Obtener todos los clientes
+// Obtener todos los clientes o buscar por email o DNI
 app.get('/api/clientes', (req, res) => {
+    const { email, dni } = req.query;
+    console.log("Parámetros de consulta:", req.query); // Ver qué parámetros están llegando
+  
     try {
-        const clientes = model.getClientes();
+        if (email) { // Si se pasa el email
+            const cliente = model.getClientePorEmail(email);
+            console.log("Cliente encontrado:", cliente); // Ver qué cliente se encuentra
+            if (!cliente) {
+                return res.status(404).json({ error: 'Cliente no encontrado' });
+            }
+            return res.json(cliente); // Devuelve el cliente encontrado por email
+        }
+
+        if (dni) { // Si se pasa el DNI
+            const cliente = model.getClientePorDni(dni);
+            if (!cliente) {
+                return res.status(404).json({ error: 'Cliente no encontrado' });
+            }
+            return res.json(cliente); // Devuelve el cliente encontrado por DNI
+        }
+
+        const clientes = model.getClientes(); // Si no se pasa ningún parámetro, devuelve todos los clientes
         res.json(clientes);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -234,30 +237,7 @@ app.get('/api/clientes/:id', (req, res) => {
 });
 
 
-// Buscar cliente por email
-app.get('/api/clientes', (req, res) => {
-    const { email } = req.query;
-    try {
-        const cliente = model.getClientePorEmail(email);
-        if (!cliente) return res.status(404).json({ error: 'Cliente no encontrado' });
-        res.json(cliente);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// Buscar cliente por DNI
-app.get('/api/clientes', (req, res) => {
-    const { dni } = req.query;
-    try {
-        const cliente = model.getClientePorDni(dni);
-        if (!cliente) return res.status(404).json({ error: 'Cliente no encontrado' });
-        res.json(cliente);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
+  
 // Eliminar un cliente por ID
 app.delete('/api/clientes/:id', (req, res) => {
     try {
