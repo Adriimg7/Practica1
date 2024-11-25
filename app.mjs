@@ -366,25 +366,112 @@ app.put('/api/clientes/:id/carro/items/:index', (req, res) => {
 
 // ------------------- RUTAS PARA ADMINISTRADORES -------------------
 
-// Obtener todos los administradores
+// Obtener todos los administradores o buscar por email o DNI
 app.get('/api/admins', (req, res) => {
+    const { email, dni } = req.query;
+    console.log("Parámetros de consulta:", req.query); // Ver qué parámetros están llegando
+
     try {
-        const admins = model.getAdmins();
+        // Si se pasa el email, buscamos el administrador por email
+        if (email) {
+            const admin = model.getAdministradorPorEmail(email);
+            console.log("Administrador encontrado:", admin); // Ver qué administrador se encuentra
+            if (!admin) {
+                return res.status(404).json({ error: 'Administrador no encontrado' });
+            }
+            return res.json(admin); // Devuelve el administrador encontrado por email
+        }
+
+        // Si se pasa el DNI, buscamos el administrador por DNI
+        if (dni) {
+            const admin = model.getAdministradorPorDni(dni);
+            if (!admin) {
+                return res.status(404).json({ error: 'Administrador no encontrado' });
+            }
+            return res.json(admin); // Devuelve el administrador encontrado por DNI
+        }
+
+        // Si no se pasa ningún parámetro, devuelve todos los administradores
+        const admins = model.getAdmins(); // Función que obtiene todos los administradores
         res.json(admins);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
-
-// Crear un nuevo administrador
-app.post('/api/admins', (req, res) => {
+app.get('/api/admins/:id', (req, res) => {
     try {
-        const nuevoAdmin = model.addAdmin(req.body);
-        res.status(201).json(nuevoAdmin);
+        const adminId = req.params.id; // Obtener el ID del administrador desde la URL
+        const admin = model.getAdminPorId(adminId); // Llamar al método getAdminPorId
+
+        if (!admin) {
+            return res.status(404).json({ error: 'Administrador no encontrado' }); // Si el administrador no existe
+        }
+
+        res.json(admin); // Si se encuentra el administrador, lo devolvemos
     } catch (err) {
-        res.status(400).json({ error: err.message });
+        res.status(500).json({ error: err.message }); // Manejo de errores generales
     }
 });
+
+
+app.put('/api/admins', (req, res) => {
+    try {
+        const arrayAdministradores = req.body; // Obtener el array de administradores desde el cuerpo de la solicitud
+
+        if (!arrayAdministradores || !Array.isArray(arrayAdministradores)) {
+            return res.status(400).json({ error: 'El cuerpo debe contener un array de administradores' });
+        }
+
+        // Llamar al método setAdministradores para actualizar la lista
+        const administradoresActualizados = model.setAdministradores(arrayAdministradores);
+
+        res.json(administradoresActualizados); // Responder con la lista de administradores actualizada
+    } catch (err) {
+        console.error('Error al actualizar los administradores:', err.message);
+        res.status(500).json({ error: 'Error interno del servidor' }); // Manejo de errores
+    }
+});
+app.delete('/api/admins', (req, res) => {
+    try {
+        // Llamamos al método removeAdmins para eliminar todos los administradores
+        const resultado = model.removeAdmins(); 
+
+        // Devolvemos la respuesta con los administradores eliminados
+        res.json(resultado); 
+    } catch (err) {
+        console.error('Error al eliminar los administradores:', err.message);
+        res.status(500).json({ error: 'Error interno del servidor' }); // Error en el servidor
+    }
+});
+
+
+app.post('/api/admins', (req, res) => {
+    try {
+        // Obtener el objeto del administrador desde el cuerpo de la solicitud
+        const nuevoAdmin = model.addAdmin(req.body);
+        res.status(201).json(nuevoAdmin); // Devuelve el administrador recién creado con estado 201 (Creado)
+    } catch (err) {
+        res.status(400).json({ error: err.message }); // Si ocurre un error, se devuelve el mensaje de error
+    }
+});
+app.delete('/api/admins/:id', (req, res) => {
+    try {
+        const adminId = parseInt(req.params.id); // Convertir el ID recibido a número
+        const adminEliminado = model.removeAdmin(adminId); // Llamar al método del modelo
+
+        if (!adminEliminado) {
+            return res.status(404).json({ error: 'Administrador no encontrado' });
+        }
+
+        res.status(200).json({
+            message: 'Administrador eliminado exitosamente',
+            admin: adminEliminado,
+        });
+    } catch (err) {
+        res.status(400).json({ error: err.message }); // Manejo de errores
+    }
+});
+
 
 // Autenticar administrador
 app.post('/api/admins/autenticar', (req, res) => {

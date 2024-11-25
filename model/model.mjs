@@ -208,6 +208,17 @@ autenticar(obj) {
     else if (usuario.verificar(password)) return usuario;
     else throw new Error('Error en la contraseña');
 }
+removeAdmin(id) {
+  const index = this.usuarios.findIndex(admin => admin._id === parseInt(id));
+
+  if (index === -1) {
+      throw new Error("Administrador no encontrado");
+  }
+
+  const adminEliminado = this.usuarios.splice(index, 1);
+  return adminEliminado[0];
+}
+
 
   addAdmin(obj) {
     let admin = new Administrador();
@@ -242,6 +253,30 @@ autenticar(obj) {
     Object.assign(usuario, obj);
     return usuario;
   }
+  setAdministradores(array) {
+    if (!Array.isArray(array)) {
+        throw new Error('El parámetro debe ser un array'); // Validar que el parámetro sea un array
+    }
+
+    // Asegúrate de que todos los objetos en el array sean administradores válidos
+    array.forEach(admin => {
+        if (!admin._id || !admin.dni || !admin.nombre || !admin.email || !admin.rol || admin.rol !== 'ADMIN') {
+            throw new Error('El administrador debe tener un _id, dni, nombre, email, rol y el rol debe ser "ADMIN"');
+        }
+    });
+
+    this.usuarios = array; // Reemplaza la lista de administradores actual por la nueva
+    return this.usuarios; // Retorna la lista actualizada de administradores
+}
+
+removeAdmins() {
+  // Filtrar el array de usuarios y eliminar aquellos con rol 'ADMIN'
+  this.usuarios = this.usuarios.filter(u => u.rol !== ROL.ADMIN); 
+
+  // Retornar un mensaje de éxito
+  return { message: 'Todos los administradores han sido eliminados' };
+}
+
 
   getClientePorEmail(email) {
     return this.usuarios.find(u => u.rol == ROL.CLIENTE && u.email == email);
@@ -250,11 +285,31 @@ autenticar(obj) {
   getClientePorId(id) {
     return this.usuarios.find(u => u.rol == ROL.CLIENTE && u._id == id);
   }
-
+// Método para buscar administrador por ID
+getAdminPorId(id) {
+  // Buscar el administrador por su ID
+  const admin = this.usuarios.find(admin => admin._id === parseInt(id));
+  return admin || null; // Si no se encuentra, devuelve null
+}
   getAdministradorPorEmail(email) {
     return this.usuarios.find(u => u.rol == ROL.ADMIN && u.email == email);
   }
+  getAdministradorPorId(id) {
+    console.log('Buscando administrador con ID:', id); // Verificación del ID recibido
+    // Asegúrate de que la comparación sea correcta, usando parseInt o toString si es necesario
+    const administrador = this.usuarios.find(u => u.rol === ROL.ADMIN && u._id === id);
+    
+    if (!administrador) {
+        console.log('Administrador no encontrado con ID:', id); // Verificación de si se encontró o no
+    }
+    
+    return administrador; // Retorna el administrador encontrado o null si no existe
+}
 
+
+  getAdministradorPorDni(dni) {
+    return this.usuarios.find(u => u.rol == ROL.ADMIN && u.dni == dni);
+  }
   autenticar(obj) {
     let email = obj.email;
     let password = obj.password;
@@ -268,6 +323,20 @@ autenticar(obj) {
     else if (usuario.verificar(password)) return usuario;
     else throw new Error('Error en la contraseña');
   }
+  addAdmin(obj) {
+    // Verificar si ya existe un administrador con el mismo email
+    let adminExistente = this.getAdministradorPorEmail(obj.email);
+    if (adminExistente) {
+        throw new Error('Correo electrónico ya registrado como administrador');
+    }
+
+    // Crear una nueva instancia de Administrador
+    let admin = new Administrador(); // Suponiendo que Administrador es una clase que extiende Cliente
+    Object.assign(admin, obj); // Asignar los datos del objeto al administrador
+    admin.assignId(); // Asignar un ID único al administrador
+    this.usuarios.push(admin); // Agregar el administrador a la lista de usuarios
+    return admin; // Devolver el administrador recién creado
+}
 
   addClienteCarroItem(id, item) {
     // Obtener el cliente por su ID
