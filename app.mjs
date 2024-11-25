@@ -4,6 +4,8 @@ import url from 'url';
 import { model } from './model/model.mjs'; // Asegúrate de que model.mjs esté correctamente importado
 import { seed } from './model/seeder.mjs'; // Datos de prueba
 
+import { ROL } from './model/model.mjs';
+
 seed(); // Inicializa los datos
 
 const STATIC_DIR = url.fileURLToPath(new URL('.', import.meta.url)); // Ruta base de archivos estáticos
@@ -414,7 +416,7 @@ app.get('/api/admins/:id', (req, res) => {
 });
 
 
-app.put('/api/admins', (req, res) => {
+app.put('/api/admins/', (req, res) => {
     try {
         const arrayAdministradores = req.body; // Obtener el array de administradores desde el cuerpo de la solicitud
 
@@ -471,15 +473,72 @@ app.delete('/api/admins/:id', (req, res) => {
         res.status(400).json({ error: err.message }); // Manejo de errores
     }
 });
+app.put('/api/admins/:id', (req, res) => {
+    try {
+        const id = req.params.id; // Obtener el ID del administrador de la URL
+        const data = req.body; // Obtener los datos para actualizar desde el cuerpo de la solicitud
 
+        // Llamar al método updateUsuario del modelo para actualizar el administrador
+        const adminActualizado = model.updateUsuario({ _id: parseInt(id), ...data });
 
-// Autenticar administrador
+        // Validar que el usuario actualizado sea un administrador
+        if (!adminActualizado || adminActualizado.rol !== ROL.ADMIN) {
+            return res.status(404).json({ error: 'Administrador no encontrado o no válido' });
+        }
+
+        // Responder con el administrador actualizado
+        res.json({
+            message: 'Administrador actualizado exitosamente',
+            admin: adminActualizado,
+        });
+    } catch (error) {
+        // Manejar errores y devolver un mensaje de error
+        res.status(400).json({ error: error.message });
+    }
+});
+
 app.post('/api/admins/autenticar', (req, res) => {
     try {
-        const admin = model.autenticar(req.body);
-        res.json(admin);
-    } catch (err) {
-        res.status(401).json({ error: err.message });
+        const { email, password } = req.body; // Obtener email y contraseña del cuerpo de la solicitud
+
+        // Validar que los campos necesarios están presentes
+        if (!email || !password) {
+            return res.status(400).json({ error: 'El correo y la contraseña son obligatorios' });
+        }
+
+        // Autenticar el administrador usando el método del modelo
+        const admin = model.autenticar({ email, password, rol: ROL.ADMIN });
+
+        // Devolver el administrador autenticado
+        res.status(200).json({
+            message: 'Autenticación exitosa',
+            admin,
+        });
+    } catch (error) {
+        // Manejar errores y devolver un mensaje adecuado
+        res.status(401).json({ error: error.message });
+    }
+});
+app.post('/api/admins/signin', (req, res) => {
+    try {
+        const { email, password } = req.body; // Obtener email y contraseña del cuerpo de la solicitud
+
+        // Validar que los campos necesarios están presentes
+        if (!email || !password) {
+            return res.status(400).json({ error: 'El correo y la contraseña son obligatorios' });
+        }
+
+        // Autenticar el administrador usando el método del modelo
+        const admin = model.autenticar({ email, password, rol: ROL.ADMIN });
+
+        // Devolver el administrador autenticado
+        res.status(200).json({
+            message: 'Inicio de sesión exitoso',
+            admin,
+        });
+    } catch (error) {
+        // Manejar errores y devolver un mensaje adecuado
+        res.status(401).json({ error: error.message });
     }
 });
 
