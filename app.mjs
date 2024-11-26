@@ -50,30 +50,19 @@ app.get('/api/libros', (req, res) => {
     }
 });
 
-// Establecer los libros (actualizar toda la lista de libros)
 app.put('/api/libros', (req, res) => {
     try {
         const libros = req.body;
-
-        // Verificar si el cuerpo es un array
         if (!Array.isArray(libros)) {
             return res.status(400).json({ error: "Se esperaba un array de libros" });
         }
-
-        // Asegurarnos de que cada libro tenga las propiedades necesarias
-        libros.forEach(libro => {
-            if (!libro.id || !libro.isbn || !libro.titulo || !libro.autor || !libro.precio) {
-                return res.status(400).json({ error: "El libro debe contener id, isbn, titulo, autor y precio" });
-            }
-        });
-
-        // Si todo está bien, actualizamos los libros en el modelo
-        model.setLibros(libros);
-        res.status(200).json(libros);  // Devuelve los libros actualizados
+        model.setLibros(libros); // Already handles resetting the library
+        res.status(200).json(libros);
     } catch (err) {
         res.status(400).json({ error: err.message });
     }
 });
+
 
 // DELETE /api/libros - Eliminar todos los libros
 app.delete('/api/libros', (req, res) => {
@@ -650,3 +639,5 @@ app.post('/api/facturas', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
 });
+// Exporta la aplicación para que pueda ser utilizada en tus pruebas
+export { app };

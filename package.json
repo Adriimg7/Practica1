@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "app.mjs",
   "scripts": {
-    "test": ".\\node_modules\\.bin\\mocha .\\test\\**\\*.spec.mjs --reporter spec",
+    "test-rest": ".\\node_modules\\.bin\\mocha .\\test\\rest.spec.mjs --reporter spec --exit",
+    "test-model": ".\\node_modules\\.bin\\mocha .\\test\\model.spec.mjs --reporter spec",
     "start": "node ."
   },
   "keywords": [],
@@ -11,8 +12,9 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "chai": "^5.1.1",
-    "mocha": "^10.7.3"
+    "chai": "^5.1.2",
+    "chai-http": "^5.1.1",
+    "mocha": "^10.8.1"
   },
   "dependencies": {
     "express": "^4.21.1",

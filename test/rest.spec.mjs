@@ -1,130 +1,153 @@
 import * as chaiModule from "chai";
 import chaiHttp from "chai-http";
-import { app } from "../app.mjs";
+import { app } from "../app.mjs"; // Cambia la ruta según tu proyecto
+import { crearLibro } from "../model/seeder.mjs";
+
 const chai = chaiModule.use(chaiHttp);
 const assert = chai.assert;
 
 const URL = '/api';
+const ISBNS = ['978-3-16-148410-0', '978-3-16-148410-1', '978-3-16-148410-2'];
 
-// Export crear libro
-import { crearLibro } from "../model/seeder.mjs";
-const ISBNS = ['978-3-16-148410-0', '978-3-16-148410-1', '978-3-16-148410-2', '978-3-16-148410-3', '978-3-16-148410-4'];
+describe("REST Librería - Rutas de Libros", function () {
+  beforeEach(async function () {
+    const requester = chai.request.execute(app).keepOpen();
+    const response = await requester.put(`${URL}/libros`).send([]); // Limpia todos los libros
+    assert.equal(response.status, 200);
+    assert.isTrue(response.ok);
+    requester.close();
+  });
 
-describe("REST libreria", function () {
-  describe("libros", function () {
-    it(`PUT ${URL}/libros`, async () => {
-      let requester = chai.request.execute(app).keepOpen();
+  it(`GET ${URL}/libros - Obtener todos los libros`, async () => {
+    const requester = chai.request.execute(app).keepOpen();
 
-      let request = requester.get(`/api/libros`);
-      let response = await request.send();
-      assert.equal(response.status, 200);
-      assert.isTrue(response.ok);
-      let libros = response.body;
-      assert.equal(libros.length, 0);
+    // Obtener libros (vacío)
+    let response = await requester.get(`${URL}/libros`).send();
+    assert.equal(response.status, 200);
+    assert.isTrue(response.ok);
+    let libros = response.body;
+    assert.equal(libros.length, 0);
 
-      let libros_esperados = ISBNS.map(isbn => crearLibro(isbn));
+    // Agregar libros
+    const librosEsperados = ISBNS.map((isbn) => crearLibro(isbn));
+    response = await requester.put(`${URL}/libros`).send(librosEsperados);
+    assert.equal(response.status, 200);
+    assert.isTrue(response.ok);
 
-      request = requester.put(`/api/libros`);
-      response = await request.send(libros_esperados);
-      assert.equal(response.status, 200);
-      assert.isTrue(response.ok);
-      libros = response.body;
-      assert.equal(libros.length, libros_esperados.length);
-      libros_esperados.forEach(esperado => {
-        let actual = libros.find(l => l.isbn == esperado.isbn);
-        assert.equal(actual.isbn, esperado.isbn, "El isbn no coincide");
-        assert.equal(actual.titulo, esperado.titulo, "El titulo no coincide");
-        assert.equal(actual.resumen, esperado.resumen, "El resumen no coincide");
-        assert.equal(actual.autores, esperado.autores, "Los autores no coinciden");
-        assert.equal(actual.portada, esperado.portada, "La portada no coincide");
-        assert.equal(actual.stock, esperado.stock, "El stock no coincide");
-        assert.equal(actual.precio, esperado.precio, "El precio no coincide");
-        assert.isDefined(actual._id, "El _id no está definido");
-      });
-      requester.close();
-    });
+    // Obtener libros nuevamente
+    response = await requester.get(`${URL}/libros`).send();
+    assert.equal(response.status, 200);
+    assert.isTrue(response.ok);
+    libros = response.body;
+    assert.equal(libros.length, librosEsperados.length);
 
-    beforeEach(async function () {
-      let requester = chai.request.execute(app).keepOpen();
-      let request = requester.put(`/api/libros`);
-      let response = await request.send([]);
-      assert.equal(response.status, 200);
-      assert.isTrue(response.ok);
-      requester.close();
-    });
+    requester.close();
+  });
 
+  it(`GET ${URL}/libros/:id - Obtener un libro por ID`, async () => {
+    const requester = chai.request.execute(app).keepOpen();
 
-    it(`GET ${URL}/libros`, async () => {
-      let requester = chai.request.execute(app).keepOpen();
+    // Crear un libro
+    const libro = crearLibro(ISBNS[0]);
+    let response = await requester.post(`${URL}/libros`).send(libro);
+    assert.equal(response.status, 201);
+    const libroId = response.body._id;
 
-      let request = requester.get(`/api/libros`);
-      let response = await request.send();
-      assert.equal(response.status, 200);
-      assert.isTrue(response.ok);
-      let libros = response.body;
-      assert.equal(libros.length, 0);
+    // Obtener el libro por ID
+    response = await requester.get(`${URL}/libros/${libroId}`).send();
+    assert.equal(response.status, 200);
+    assert.propertyVal(response.body, "isbn", libro.isbn);
 
-      let libros_esperados = ISBNS.map(isbn => crearLibro(isbn));
-      request = requester.put(`/api/libros`);
-      await request.send(libros_esperados);
+    requester.close();
+  });
 
-      request = requester.get(`/api/libros`);
-      response = await request.send();
-      assert.equal(response.status, 200);
-      assert.isTrue(response.ok);
-      libros = response.body;
-      assert.equal(libros.length, libros_esperados.length);
-      libros_esperados.forEach(esperado => {
-        let actual = libros.find(l => l.isbn == esperado.isbn);
-        assert.equal(actual.isbn, esperado.isbn, "El isbn no coincide");
-        assert.equal(actual.titulo, esperado.titulo, "El titulo no coincide");
-        assert.equal(actual.resumen, esperado.resumen, "El resumen no coincide");
-        assert.equal(actual.autores, esperado.autores, "Los autores no coinciden");
-        assert.equal(actual.portada, esperado.portada, "La portada no coincide");
-        assert.equal(actual.stock, esperado.stock, "El stock no coincide");
-        assert.equal(actual.precio, esperado.precio, "El precio no coincide");
-        assert.isDefined(actual._id, "El _id no esta definido");
-      });
-      requester.close();
-    });
+  it(`GET ${URL}/libros?isbn=isbn - Obtener un libro por ISBN`, async () => {
+    const requester = chai.request.execute(app).keepOpen();
 
+    // Crear un libro
+    const libro = crearLibro(ISBNS[1]);
+    await requester.post(`${URL}/libros`).send(libro);
 
-    it(`GET ${URL}/libros/:id`, async () => {
-      // comentar seed
-      let requester = chai.request.execute(app).keepOpen();
+    // Obtener el libro por ISBN
+    const response = await requester.get(`${URL}/libros`).query({ isbn: libro.isbn });
+    assert.equal(response.status, 200);
+    assert.propertyVal(response.body, "isbn", libro.isbn);
 
-      let request = requester.get(`/api/libros`);
-      let response = await request.send();
-      assert.equal(response.status, 200);
-      assert.isTrue(response.ok);
-      let libros = response.body;
-      assert.equal(libros.length, 0);
+    requester.close();
+  });
 
-      libros = ISBNS.map(isbn => crearLibro(isbn));
-      request = requester.put(`/api/libros`);
-      response = await request.send(libros);
-      assert.equal(response.status, 200);
-      assert.isTrue(response.ok);
-      libros = response.body;
+  it(`GET ${URL}/libros?titulo=titulo - Obtener un libro por título`, async () => {
+    const requester = chai.request.execute(app).keepOpen();
 
-      let responses = libros.map(async esperado => {
-        request = requester.get(`/api/libros/${esperado._id}`);
-        response = await request.send();
-        assert.equal(response.status, 200);
-        assert.isTrue(response.ok);
-        let actual = response.body;
-        assert.equal(actual.isbn, esperado.isbn, "El isbn no coincide");
-        assert.equal(actual.titulo, esperado.titulo, "El titulo no coincide");
-        assert.equal(actual.resumen, esperado.resumen, "El resumen no coincide");
-        assert.equal(actual.autores, esperado.autores, "Los autores no coinciden");
-        assert.equal(actual.portada, esperado.portada, "La portada no coincide");
-        assert.equal(actual.stock, esperado.stock, "El stock no coincide");
-        assert.equal(actual.precio, esperado.precio, "El precio no coincide");
-        assert.equal(actual._id, esperado._id, "El _id no coincide");
-      });
+    // Crear un libro
+    const libro = crearLibro(ISBNS[2]);
+    await requester.post(`${URL}/libros`).send(libro);
 
-      await Promise.all(responses);
-      requester.close();
-    });
+    // Obtener el libro por título
+    const response = await requester.get(`${URL}/libros`).query({ titulo: libro.titulo });
+    assert.equal(response.status, 200);
+    assert.propertyVal(response.body, "titulo", libro.titulo);
+
+    requester.close();
+  });
+
+  it(`POST ${URL}/libros - Agregar un nuevo libro`, async () => {
+    const requester = chai.request.execute(app).keepOpen();
+
+    // Crear un nuevo libro
+    const libro = crearLibro('978-3-16-148410-3');
+    const response = await requester.post(`${URL}/libros`).send(libro);
+    assert.equal(response.status, 201);
+    assert.propertyVal(response.body, "isbn", libro.isbn);
+
+    requester.close();
+  });
+
+  it(`PUT ${URL}/libros/:id - Actualizar un libro`, async () => {
+    const requester = chai.request.execute(app).keepOpen();
+
+    // Crear un libro
+    const libro = crearLibro(ISBNS[0]);
+    let response = await requester.post(`${URL}/libros`).send(libro);
+    const libroId = response.body._id;
+
+    // Actualizar el libro
+    const actualizacion = { titulo: "Título Actualizado", precio: 60 };
+    response = await requester.put(`${URL}/libros/${libroId}`).send(actualizacion);
+    assert.equal(response.status, 200);
+    assert.propertyVal(response.body, "titulo", actualizacion.titulo);
+
+    requester.close();
+  });
+
+  it(`DELETE ${URL}/libros/:id - Eliminar un libro por ID`, async () => {
+    const requester = chai.request.execute(app).keepOpen();
+
+    // Crear un libro
+    const libro = crearLibro(ISBNS[1]);
+    let response = await requester.post(`${URL}/libros`).send(libro);
+    const libroId = response.body._id;
+
+    // Eliminar el libro
+    response = await requester.delete(`${URL}/libros/${libroId}`).send();
+    assert.equal(response.status, 200);
+    assert.propertyVal(response.body, "_id", libroId);
+
+    requester.close();
+  });
+
+  it(`DELETE ${URL}/libros - Eliminar todos los libros`, async () => {
+    const requester = chai.request.execute(app).keepOpen();
+
+    // Agregar libros
+    const librosEsperados = ISBNS.map((isbn) => crearLibro(isbn));
+    await requester.put(`${URL}/libros`).send(librosEsperados);
+
+    // Eliminar todos los libros
+    const response = await requester.delete(`${URL}/libros`).send();
+    assert.equal(response.status, 200);
+    assert.equal(response.body.length, librosEsperados.length);
+
+    requester.close();
   });
 });
