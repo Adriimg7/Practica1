@@ -2,6 +2,8 @@ import * as chaiModule from "chai";
 import chaiHttp from "chai-http";
 import { app } from "../app.mjs"; // Cambia la ruta según tu proyecto
 import { crearLibro } from "../model/seeder.mjs"; // Asegúrate de tener esta función disponible
+import { crearCliente } from "../model/seeder.mjs";
+
 
 const chai = chaiModule.use(chaiHttp);
 const assert = chai.assert;
@@ -508,5 +510,119 @@ describe("Rutas de Administradores", function () {
     requester.close();
   });
 });
+ /** Rutas de Facturas */
+ describe("Rutas de Facturas", function () {
 
+  it(`GET ${URL}/facturas - Obtener todas las facturas`, async () => {
+    const requester = chai.request.execute(app).keepOpen();
+
+    // Obtener facturas (vacío)
+    let response = await requester.get(`${URL}/facturas`).send();
+    assert.equal(response.status, 200);
+    let facturas = response.body;
+    assert.equal(facturas.length, 0);
+
+    // Agregar facturas manualmente
+    const facturasEsperadas = [
+      { _id: "60d1e88b3b1f0d15d0c45b11", numero: 1, cliente: "123", items: [], total: 100, fecha: "2024-11-25" },
+      { _id: "60d1e88b3b1f0d15d0c45b12", numero: 2, cliente: "124", items: [], total: 150, fecha: "2024-11-26" }
+    ];
+    response = await requester.put(`${URL}/facturas`).send(facturasEsperadas);
+    assert.equal(response.status, 200);
+
+    // Obtener facturas nuevamente
+    response = await requester.get(`${URL}/facturas`).send();
+    facturas = response.body;
+    assert.equal(facturas.length, facturasEsperadas.length);
+
+    requester.close();
+  });
+
+  it(`POST ${URL}/facturas - Crear una nueva factura`, async () => {
+    const requester = chai.request.execute(app).keepOpen();
+
+    const factura = { _id: "60d1e88b3b1f0d15d0c45b13", numero: 3, cliente: "125", items: [], total: 200, fecha: "2024-11-27" };
+    const response = await requester.post(`${URL}/facturas`).send(factura);
+    assert.equal(response.status, 201);
+    assert.propertyVal(response.body, "numero", factura.numero);
+
+    requester.close();
+  });
+
+  it(`PUT ${URL}/facturas - Establecer la lista de facturas`, async () => {
+    const requester = chai.request.execute(app).keepOpen();
+
+    // Crear facturas manualmente
+    const facturasEsperadas = [
+      { _id: "60d1e88b3b1f0d15d0c45b11", numero: 1, cliente: "123", items: [], total: 100, fecha: "2024-11-25" },
+      { _id: "60d1e88b3b1f0d15d0c45b12", numero: 2, cliente: "124", items: [], total: 150, fecha: "2024-11-26" }
+    ];
+    let response = await requester.put(`${URL}/facturas`).send(facturasEsperadas);
+    assert.equal(response.status, 200);
+    let facturas = response.body;
+    assert.equal(facturas.length, facturasEsperadas.length);
+
+    requester.close();
+  });
+
+  it(`GET ${URL}/facturas/:id - Obtener una factura por ID`, async () => {
+    const requester = chai.request.execute(app).keepOpen();
+
+    // Crear factura manualmente
+    const factura = { _id: "60d1e88b3b1f0d15d0c45b11", numero: 1, cliente: "123", items: [], total: 100, fecha: "2024-11-25" };
+    let response = await requester.post(`${URL}/facturas`).send(factura);
+    const facturaId = response.body._id;
+
+    response = await requester.get(`${URL}/facturas/${facturaId}`).send();
+    assert.equal(response.status, 200);
+    assert.propertyVal(response.body, "numero", factura.numero);
+
+    requester.close();
+  });
+
+  it(`GET ${URL}/facturas?numero=numero - Obtener una factura por número`, async () => {
+    const requester = chai.request.execute(app).keepOpen();
+
+    const factura = { _id: "60d1e88b3b1f0d15d0c45b12", numero: 2, cliente: "124", items: [], total: 150, fecha: "2024-11-26" };
+    await requester.post(`${URL}/facturas`).send(factura);
+
+    const response = await requester.get(`${URL}/facturas`).query({ numero: factura.numero });
+    assert.equal(response.status, 200);
+    assert.propertyVal(response.body, "numero", factura.numero);
+
+    requester.close();
+  });
+
+  it(`GET ${URL}/facturas?cliente=id - Obtener las facturas por cliente`, async () => {
+    const requester = chai.request.execute(app).keepOpen();
+
+    const clienteId = "123"; // Suponiendo que el cliente tiene este ID
+    const factura = { _id: "60d1e88b3b1f0d15d0c45b13", numero: 3, cliente: clienteId, items: [], total: 200, fecha: "2024-11-27" };
+    await requester.post(`${URL}/facturas`).send(factura);
+
+    const response = await requester.get(`${URL}/facturas`).query({ cliente: clienteId });
+    assert.equal(response.status, 200);
+    assert.propertyVal(response.body[0], "cliente", clienteId);
+
+    requester.close();
+  });
+
+  
+
+  it(`DELETE ${URL}/facturas - Eliminar todas las facturas`, async () => {
+    const requester = chai.request.execute(app).keepOpen();
+
+    const facturasEsperadas = [
+      { _id: "60d1e88b3b1f0d15d0c45b11", numero: 1, cliente: "123", items: [], total: 100, fecha: "2024-11-25" },
+      { _id: "60d1e88b3b1f0d15d0c45b12", numero: 2, cliente: "124", items: [], total: 150, fecha: "2024-11-26" }
+    ];
+    await requester.put(`${URL}/facturas`).send(facturasEsperadas);
+
+    const response = await requester.delete(`${URL}/facturas`).send();
+    assert.equal(response.status, 200);
+    assert.equal(response.body.deletedCount, facturasEsperadas.length);
+
+    requester.close();
+  });
+});
 });

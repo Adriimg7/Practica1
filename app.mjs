@@ -63,7 +63,6 @@ app.put('/api/libros', (req, res) => {
     }
 });
 
-
 // DELETE /api/libros - Eliminar todos los libros
 app.delete('/api/libros', (req, res) => {
     try {
@@ -73,7 +72,6 @@ app.delete('/api/libros', (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
-
 
 // Crear un nuevo libro
 app.post('/api/libros', (req, res) => {
@@ -100,7 +98,6 @@ app.get('/api/libros/:id', (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
-
 
 // Eliminar un libro por ID
 app.delete('/api/libros/:id', (req, res) => {
@@ -136,7 +133,6 @@ app.put('/api/libros/:id', (req, res) => {
         res.status(500).json({ error: 'Error interno del servidor' }); // Error genérico
     }
 });
-
 
 // ------------------- RUTAS PARA CLIENTES -------------------
 
@@ -184,7 +180,6 @@ app.put('/api/clientes', async (req, res) => {
 });
 
 
-
 app.delete('/api/clientes', (req, res) => {
     try {
         // Llamamos al método removeClientes para eliminar todos los clientes
@@ -198,7 +193,6 @@ app.delete('/api/clientes', (req, res) => {
     }
 });
 
-
 app.post('/api/clientes', (req, res) => {
     try {
         // Obtener el objeto del cliente desde el cuerpo de la solicitud
@@ -208,7 +202,6 @@ app.post('/api/clientes', (req, res) => {
         res.status(400).json({ error: err.message }); // Si ocurre un error, se devuelve el mensaje de error
     }
 });
-
 
 
 app.get('/api/clientes/:id', (req, res) => {
@@ -225,7 +218,6 @@ app.get('/api/clientes/:id', (req, res) => {
         res.status(500).json({ error: err.message }); // Manejo de errores generales
     }
 });
-
 
   
 // Eliminar un cliente por ID
@@ -353,7 +345,6 @@ app.put('/api/clientes/:id/carro/items/:index', (req, res) => {
     }
 });
 
-
 // ------------------- RUTAS PARA ADMINISTRADORES -------------------
 
 // Obtener todos los administradores o buscar por email o DNI
@@ -403,7 +394,6 @@ app.get('/api/admins/:id', (req, res) => {
     }
 });
 
-
 app.put('/api/admins/', (req, res) => {
     try {
         const arrayAdministradores = req.body; // Obtener el array de administradores desde el cuerpo de la solicitud
@@ -433,7 +423,6 @@ app.delete('/api/admins', (req, res) => {
         res.status(500).json({ error: 'Error interno del servidor' }); // Error en el servidor
     }
 });
-
 
 app.post('/api/admins', (req, res) => {
     try {
@@ -576,7 +565,6 @@ app.get('/api/facturas/:id', (req, res) => {
     }
 });
 
-
 // Crear una factura
 app.post('/api/facturas', (req, res) => {
     try {
@@ -628,7 +616,6 @@ app.post('/api/facturas', (req, res) => {
         res.status(400).json({ error: err.message }); // Manejo de errores
     }
 });
-
 
 // Iniciar el servidor
 app.listen(PORT, () => {
