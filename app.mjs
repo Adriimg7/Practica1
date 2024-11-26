@@ -143,12 +143,12 @@ app.put('/api/libros/:id', (req, res) => {
 // Obtener todos los clientes o buscar por email o DNI
 app.get('/api/clientes', (req, res) => {
     const { email, dni } = req.query;
-    console.log("Parámetros de consulta:", req.query); // Ver qué parámetros están llegando
+    
   
     try {
         if (email) { // Si se pasa el email
             const cliente = model.getClientePorEmail(email);
-            console.log("Cliente encontrado:", cliente); // Ver qué cliente se encuentra
+            
             if (!cliente) {
                 return res.status(404).json({ error: 'Cliente no encontrado' });
             }
@@ -170,24 +170,19 @@ app.get('/api/clientes', (req, res) => {
     }
 });
 
-// Establecer los clientes (actualizar toda la lista de clientes)
-app.put('/api/clientes', (req, res) => {
+app.put('/api/clientes', async (req, res) => {
     try {
-        const arrayClientes = req.body; // Obtener el array de clientes desde el cuerpo de la solicitud
-
-        if (!arrayClientes || !Array.isArray(arrayClientes)) {
-            return res.status(400).json({ error: 'El cuerpo debe contener un array de clientes' });
+        const clientes = req.body;
+        if (!Array.isArray(clientes)) {
+            return res.status(400).json({ error: "Se esperaba un array de clientes" });
         }
-
-        // Llamar al método setClientes para actualizar la lista
-        const clientesActualizados = model.setClientes(arrayClientes);
-
-        res.json(clientesActualizados); // Responder con la lista de clientes actualizada
+        await model.setClientes(clientes); // Método que guarda o reemplaza la lista completa
+        res.status(200).json(clientes);
     } catch (err) {
-        console.error('Error al actualizar los clientes:', err.message);
-        res.status(500).json({ error: 'Error interno del servidor' }); // Manejo de errores
+        res.status(500).json({ error: err.message });
     }
 });
+
 
 
 app.delete('/api/clientes', (req, res) => {
@@ -364,13 +359,13 @@ app.put('/api/clientes/:id/carro/items/:index', (req, res) => {
 // Obtener todos los administradores o buscar por email o DNI
 app.get('/api/admins', (req, res) => {
     const { email, dni } = req.query;
-    console.log("Parámetros de consulta:", req.query); // Ver qué parámetros están llegando
+    
 
     try {
         // Si se pasa el email, buscamos el administrador por email
         if (email) {
             const admin = model.getAdministradorPorEmail(email);
-            console.log("Administrador encontrado:", admin); // Ver qué administrador se encuentra
+            
             if (!admin) {
                 return res.status(404).json({ error: 'Administrador no encontrado' });
             }
@@ -449,46 +444,46 @@ app.post('/api/admins', (req, res) => {
         res.status(400).json({ error: err.message }); // Si ocurre un error, se devuelve el mensaje de error
     }
 });
-app.delete('/api/admins/:id', (req, res) => {
-    try {
-        const adminId = parseInt(req.params.id); // Convertir el ID recibido a número
-        const adminEliminado = model.removeAdmin(adminId); // Llamar al método del modelo
+app.delete('/api/admins/:id', async (req, res) => {
+  const { id } = req.params; // Obtener el ID desde los parámetros de la URL
 
-        if (!adminEliminado) {
-            return res.status(404).json({ error: 'Administrador no encontrado' });
-        }
+  try {
+    // Buscar y eliminar el administrador por ID
+    const admin = await Admin.findByIdAndDelete(id);
 
-        res.status(200).json({
-            message: 'Administrador eliminado exitosamente',
-            admin: adminEliminado,
-        });
-    } catch (err) {
-        res.status(400).json({ error: err.message }); // Manejo de errores
+    if (!admin) {
+      return res.status(404).json({ error: 'Administrador no encontrado' });
     }
+
+    // Devolver el ID del administrador eliminado
+    res.status(200).json({ _id: admin._id });
+  } catch (error) {
+    // Si ocurre un error, devolver un error 500
+    res.status(500).json({ error: error.message });
+  }
 });
-app.put('/api/admins/:id', (req, res) => {
+
+  
+app.put('/api/admins/:id', async (req, res) => {
+    const { id } = req.params;
+    const updateData = req.body; // Los datos para actualizar
+  
     try {
-        const id = req.params.id; // Obtener el ID del administrador de la URL
-        const data = req.body; // Obtener los datos para actualizar desde el cuerpo de la solicitud
-
-        // Llamar al método updateUsuario del modelo para actualizar el administrador
-        const adminActualizado = model.updateUsuario({ _id: parseInt(id), ...data });
-
-        // Validar que el usuario actualizado sea un administrador
-        if (!adminActualizado || adminActualizado.rol !== ROL.ADMIN) {
-            return res.status(404).json({ error: 'Administrador no encontrado o no válido' });
-        }
-
-        // Responder con el administrador actualizado
-        res.json({
-            message: 'Administrador actualizado exitosamente',
-            admin: adminActualizado,
-        });
+      // Buscar el administrador y actualizarlo
+      const admin = await Admin.findByIdAndUpdate(id, updateData, { new: true });
+  
+      if (!admin) {
+        return res.status(404).json({ error: 'Administrador no encontrado' });
+      }
+  
+      // Devolver el administrador actualizado
+      res.status(200).json(admin);
     } catch (error) {
-        // Manejar errores y devolver un mensaje de error
-        res.status(400).json({ error: error.message });
+      // Si hay algún error, devolver un error 500
+      res.status(500).json({ error: error.message });
     }
-});
+  });
+  
 
 app.post('/api/admins/autenticar', (req, res) => {
     try {

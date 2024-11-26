@@ -295,17 +295,51 @@ getAdminPorId(id) {
     return this.usuarios.find(u => u.rol == ROL.ADMIN && u.email == email);
   }
   getAdministradorPorId(id) {
-    console.log('Buscando administrador con ID:', id); // Verificación del ID recibido
+   
     // Asegúrate de que la comparación sea correcta, usando parseInt o toString si es necesario
     const administrador = this.usuarios.find(u => u.rol === ROL.ADMIN && u._id === id);
     
     if (!administrador) {
-        console.log('Administrador no encontrado con ID:', id); // Verificación de si se encontró o no
+       
     }
     
     return administrador; // Retorna el administrador encontrado o null si no existe
 }
 
+setClientes(array) {
+  if (!Array.isArray(array)) {
+      throw new Error('El parámetro debe ser un array');
+  }
+  // Validar que los clientes tengan los campos básicos.
+  array.forEach(cliente => {
+      if (!cliente.nombre || !cliente.email || !cliente.dni) {
+          throw new Error('El cliente debe tener nombre, email y dni');
+      }
+  });
+  // Reemplazar la lista de clientes.
+  this.usuarios = array.filter(cliente => cliente.rol === ROL.CLIENTE);
+  return this.usuarios;
+}
+
+addClienteCarroItem(id, item) {
+  const cliente = this.getClientePorId(id);
+  if (!cliente) throw new Error("Cliente no encontrado");
+
+  // Si el cliente no tiene carro, inicializamos uno vacío
+  if (!cliente.carro) cliente.carro = { items: [] };
+
+  // Añadimos el ítem al carro
+  cliente.carro.items.push(item);
+  return cliente.carro;
+}
+
+
+setClienteCarroItemCantidad(id, index, cantidad) {
+  const cliente = this.getClientePorId(id);
+  if (!cliente || !cliente.carro) throw new Error("Carro no encontrado para el cliente");
+  cliente.setCarroItemCantidad(index, cantidad);
+  return cliente.carro.items;
+}
 
   getAdministradorPorDni(dni) {
     return this.usuarios.find(u => u.rol == ROL.ADMIN && u.dni == dni);
