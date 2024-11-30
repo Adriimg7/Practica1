@@ -2,6 +2,7 @@ import { Presenter } from "../../commons/presenter.mjs";
 import { router } from "../../commons/router.mjs";
 // import { Router } from "../../commons/router.mjs";
 import { MensajesPresenter } from "../mensajes/mensajes-presenter.mjs";
+import {proxy} from "../../commons/proxy.mjs";
 
 
 export class InvitadoRegistroPresenter extends Presenter {

@@ -1,6 +1,7 @@
 import { Presenter } from "../../commons/presenter.mjs";
 import { model } from "../../model/model.mjs";
 import { router } from "../../commons/router.mjs";
+import {proxy} from "../../commons/proxy.mjs";
 
 export class AdminModificarLibroPresenter extends Presenter {
   constructor(model, view) {
@@ -60,8 +61,13 @@ export class AdminModificarLibroPresenter extends Presenter {
   }
 
   // Cargar los datos del libro en los campos del formulario
-  get libro() {
-    return model.getLibroPorId(this.id);
+  async getLibroAsync() {
+    try {
+      return await proxy.getLibroPorId(this.id);  // Usar el proxy para obtener el libro
+    } catch (e) {
+      console.error('Error al obtener el libro:', e.message);
+      return null;
+    }
   }
 
   set libro(libro) {
@@ -77,7 +83,7 @@ export class AdminModificarLibroPresenter extends Presenter {
 
   async refresh() {
     await super.refresh();
-    const libro = this.libro;
+    const libro = await this.getLibroAsync();
     if (libro) {
       this.libro = libro;
     } else {
@@ -100,7 +106,7 @@ export class AdminModificarLibroPresenter extends Presenter {
       precio: parseFloat(this.precioInput.value)
     };
     try {
-      model.updateLibro(libroModificado);
+      await proxy.updateLibro(libroModificado);
       router.navigate('/libreria/admin-ver-libro.html?id=' + this.id); // Navega de vuelta a la vista del libro modificado
     } catch (e) {
       console.error('Error al modificar el libro:', e.message);

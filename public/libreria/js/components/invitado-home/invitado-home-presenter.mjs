@@ -3,6 +3,7 @@ import { Presenter } from "../../commons/presenter.mjs";
 import { model } from "../../model/model.mjs";
 import { InvitadoCatalogoLibroPresenter } from "../invitado-catalogo-libro/invitado-catalogo-libro-presenter.mjs";
 import { MensajesPresenter } from "../mensajes/mensajes-presenter.mjs";
+import {proxy} from "../../commons/proxy.mjs";
 
 export class InvitadoHomePresenter extends Presenter {
   constructor(model, view) {

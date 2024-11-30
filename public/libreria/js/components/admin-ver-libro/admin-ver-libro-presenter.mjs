@@ -2,6 +2,7 @@ import { Presenter } from "../../commons/presenter.mjs";
 import { router } from "../../commons/router.mjs";
 import { model } from "../../model/model.mjs";
 import { MensajesPresenter } from "../mensajes/mensajes-presenter.mjs";
+import {proxy} from "../../commons/proxy.mjs";
 
 export class AdminVerLibroPresenter extends Presenter {
   constructor(model, view) {
@@ -17,8 +18,13 @@ export class AdminVerLibroPresenter extends Presenter {
     return this.searchParams.get('id');
   }
 
-  getLibro() {
-    return model.getLibroPorId(this.id);
+  async getLibro() {
+    try {
+      return await proxy.getLibroPorId(this.id);  // Llamada al proxy para obtener el libro
+    } catch (error) {
+      console.error("Error al obtener el libro:", error);
+      return null;
+    }
   }
 
   get isbnText() {
@@ -73,10 +79,10 @@ export class AdminVerLibroPresenter extends Presenter {
     return document.querySelector('#borrarLink');
   }
 
-  borrarClick(event) {
+  async borrarClick(event) {
     event.preventDefault();
     try {
-      model.removeLibro(this.id);
+      await proxy.removeLibro(this.id);
       this.mensajesPresenter.mensaje('Libro borrado!');
       router.navigate('/libreria/admin-home.html');
     } catch (e) {
@@ -90,10 +96,10 @@ export class AdminVerLibroPresenter extends Presenter {
     return document.querySelector('#desborrarLink');
   }
 
-  desborrarClick(event) {
+  async desborrarClick(event) {
     event.preventDefault();
     try {
-      model.desborrarLibro(this.id);
+      await proxy.desborrarLibro(this.id);
       this.mensajesPresenter.mensaje('Libro desborrado!');
       router.navigate('/libreria/admin-home.html');
     } catch (e) {
@@ -126,7 +132,7 @@ export class AdminVerLibroPresenter extends Presenter {
   async refresh() {
     await super.refresh();
     await this.mensajesPresenter.refresh();
-    const libro = this.getLibro();
+    const libro = await this.getLibro();
     if (libro) {
       this.libro = libro;
       this.setModificarLink(); // Configurar el enlace de modificación con el ID correcto

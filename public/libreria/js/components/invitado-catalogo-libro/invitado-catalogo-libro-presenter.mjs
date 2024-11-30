@@ -1,4 +1,5 @@
 import { Presenter } from "../../commons/presenter.mjs";
+import {proxy} from "../../commons/proxy.mjs";
 
 export class InvitadoCatalogoLibroPresenter extends Presenter {
   constructor(model, view, parentSelector) {

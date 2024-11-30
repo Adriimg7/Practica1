@@ -1,6 +1,7 @@
 import { Presenter } from "../../commons/presenter.mjs";
 // import { Router } from "../../commons/router.mjs";
 import { model } from "../../model/model.mjs";
+import {proxy} from "../../commons/proxy.mjs";
 
 export class InvitadoVerLibroPresenter extends Presenter {
   constructor(model, view) {
@@ -16,8 +17,14 @@ export class InvitadoVerLibroPresenter extends Presenter {
   }
 
   // para acceder al modelo, siempre con métodos, no con getters!
-  getLibro() {
-    return model.getLibroPorId(this.id);
+  //Ahora se utiliza el proxy
+  async getLibro() {
+    try {
+      return await proxy.getLibroPorId(this.id);  // Llamada a la API REST usando el proxy
+    } catch (error) {
+      console.error("Error al obtener el libro:", error);
+      return null;
+    }
   }
 
   get isbnParagraph() {
@@ -78,7 +85,7 @@ export class InvitadoVerLibroPresenter extends Presenter {
   async refresh() {
     await super.refresh();
     console.log(this.id);
-    let libro = this.getLibro();
+    let libro = await this.getLibro();
     if (libro) this.libro = libro;
     else console.error(`Libro ${id} not found!`);
 

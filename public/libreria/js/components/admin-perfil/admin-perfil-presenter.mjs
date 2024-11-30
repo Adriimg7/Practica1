@@ -3,6 +3,7 @@ import { model } from "../../model/model.mjs";
 import { router } from "../../commons/router.mjs";
 import { libreriaSession } from "../../commons/libreria-session.mjs";
 import { MensajesPresenter } from "../mensajes/mensajes-presenter.mjs";
+import {proxy} from "../../commons/proxy.mjs";
 
 export class AdminPerfilPresenter extends Presenter {
   constructor(model, view) {
@@ -28,19 +29,23 @@ export class AdminPerfilPresenter extends Presenter {
   get contrasenaText() { return this.contrasenaInput.value; }
 
   // Cargar datos del administrador desde el modelo o sessionStorage
-  cargarDatosAdmin() {
+  async cargarDatosAdmin() {
     const adminId = libreriaSession.getUsuarioId();
-    const admin = model.getUsuarioPorId(adminId) || JSON.parse(sessionStorage.getItem('adminDatos'));
+    try {
+      const admin = await proxy.getUsuarioPorId(adminId) || JSON.parse(sessionStorage.getItem('adminDatos'));
 
-    if (admin) {
-      this.dniInput.value = admin.dni;
-      this.nombreInput.value = admin.nombre;
-      this.apellidosInput.value = admin.apellidos;
-      this.direccionInput.value = admin.direccion;
-      this.emailInput.value = admin.email;
-      this.contrasenaInput.value = admin.password;
-    } else {
-      console.error("Administrador no encontrado en el modelo");
+      if (admin) {
+        this.dniInput.value = admin.dni;
+        this.nombreInput.value = admin.nombre;
+        this.apellidosInput.value = admin.apellidos;
+        this.direccionInput.value = admin.direccion;
+        this.emailInput.value = admin.email;
+        this.contrasenaInput.value = admin.password;
+      } else {
+        console.error("No se ha encontrado al administrador.");
+      }
+    } catch (error) {
+      console.error("Error al cargar los datos del administrador", error);
     }
   }
 
@@ -63,7 +68,7 @@ export class AdminPerfilPresenter extends Presenter {
 
     try {
       const datosActualizados = this.datosActualizadosAdmin;
-      model.updateUsuario(datosActualizados);
+      await proxy.updateUsuario(datosActualizados);
 
       // Guardar en sessionStorage para que persista tras recargar
       sessionStorage.setItem('adminDatos', JSON.stringify(datosActualizados));
