@@ -2,6 +2,7 @@
 import { model } from "./model/model.mjs";
 import { seed } from "./model/seeder.mjs";
 import { router } from "./commons/router.mjs";
+import { proxy } from "./model/proxy.mjs";
 import { InvitadoHomePresenter } from "./components/invitado-home/invitado-home-presenter.mjs";
 
 import { AdminAgregarLibroPresenter } from "./components/admin-agregar-libro/admin-agregar-libro-presenter.mjs";
@@ -23,27 +24,27 @@ import { ClienteVerCompraPresenter } from "./components/cliente-ver-compra/clien
 export function init() {
   seed();
 
-  router.register(/^\/libreria\/index\.html$/, new InvitadoHomePresenter(model, 'invitado-home'));
-  router.register(/^\/libreria\/home\.html$/, new InvitadoHomePresenter(model, 'invitado-home'));
-  router.register(/^\/libreria$/, new InvitadoHomePresenter(model, 'invitado-home'));
-  router.register(/^\/libreria\/cliente-home.html$/, new ClienteHomePresenter(model, 'cliente-home'));
-  router.register(/^\/libreria\/admin-home.html$/, new AdminHomePresenter(model, 'admin-home'));
+  router.register(/^\/libreria\/index\.html$/, new InvitadoHomePresenter(proxy, 'invitado-home'));
+  router.register(/^\/libreria\/home\.html$/, new InvitadoHomePresenter(proxy, 'invitado-home'));
+  router.register(/^\/libreria$/, new InvitadoHomePresenter(proxy, 'invitado-home'));
+  router.register(/^\/libreria\/cliente-home.html$/, new ClienteHomePresenter(proxy, 'cliente-home'));
+  router.register(/^\/libreria\/admin-home.html$/, new AdminHomePresenter(proxy, 'admin-home'));
 
-  router.register(/^\/libreria\/invitado-ingreso\.html$/, new InvitadoIngresoPresenter(model, 'invitado-ingreso'));
-  router.register(/^\/libreria\/invitado-registro\.html$/, new InvitadoRegistroPresenter(model, 'invitado-registro'));
+  router.register(/^\/libreria\/invitado-ingreso\.html$/, new InvitadoIngresoPresenter(proxy, 'invitado-ingreso'));
+  router.register(/^\/libreria\/invitado-registro\.html$/, new InvitadoRegistroPresenter(proxy, 'invitado-registro'));
 
 
-  router.register(/^\/libreria\/admin-agregar-libro.html$/, new AdminAgregarLibroPresenter(model, 'admin-agregar-libro'));
-  router.register(/^\/libreria\/invitado-ver-libro.html/, new InvitadoVerLibroPresenter(model, 'invitado-ver-libro'));
-  router.register(/^\/libreria\/admin-ver-libro.html/, new AdminVerLibroPresenter(model, 'admin-ver-libro'));
-  router.register(/^\/libreria\/cliente-ver-libro.html/, new ClienteVerLibroPresenter(model, 'cliente-ver-libro'));
-  router.register(/^\/libreria\/cliente-carro.html/, new ClienteCarroPresenter(model, 'cliente-carro'));
-  router.register(/^\/libreria\/cliente-comprar-carro.html/, new ClienteComprarCarroPresenter(model, 'cliente-comprar-carro'));
-  router.register(/^\/libreria\/cliente-facturas.html/, new ClienteFacturasPresenter(model, 'cliente-facturas'));
-  router.register(/^\/libreria\/cliente-ver-compra.html/, new ClienteVerCompraPresenter(model, 'cliente-ver-compra'));
+  router.register(/^\/libreria\/admin-agregar-libro.html$/, new AdminAgregarLibroPresenter(proxy, 'admin-agregar-libro'));
+  router.register(/^\/libreria\/invitado-ver-libro.html/, new InvitadoVerLibroPresenter(proxy, 'invitado-ver-libro'));
+  router.register(/^\/libreria\/admin-ver-libro.html/, new AdminVerLibroPresenter(mproxy, 'admin-ver-libro'));
+  router.register(/^\/libreria\/cliente-ver-libro.html/, new ClienteVerLibroPresenter(proxy, 'cliente-ver-libro'));
+  router.register(/^\/libreria\/cliente-carro.html/, new ClienteCarroPresenter(proxy, 'cliente-carro'));
+  router.register(/^\/libreria\/cliente-comprar-carro.html/, new ClienteComprarCarroPresenter(proxy, 'cliente-comprar-carro'));
+  router.register(/^\/libreria\/cliente-facturas.html/, new ClienteFacturasPresenter(proxy, 'cliente-facturas'));
+  router.register(/^\/libreria\/cliente-ver-compra.html/, new ClienteVerCompraPresenter(proxy, 'cliente-ver-compra'));
 
-  router.register(/^\/libreria\/admin-perfil.html$/, new AdminPerfilPresenter(model, 'admin-perfil'));
-  router.register(/^\/libreria\/admin-modificar-libro.html/, new AdminModificarLibroPresenter(model, 'admin-modificar-libro'));
-  router.register(/^\/libreria\/cliente-perfil.html$/, new ClientePerfilPresenter(model, 'cliente-perfil'));
+  router.register(/^\/libreria\/admin-perfil.html$/, new AdminPerfilPresenter(proxy, 'admin-perfil'));
+  router.register(/^\/libreria\/admin-modificar-libro.html/, new AdminModificarLibroPresenter(proxy, 'admin-modificar-libro'));
+  router.register(/^\/libreria\/cliente-perfil.html$/, new ClientePerfilPresenter(proxy, 'cliente-perfil'));
   router.handleLocation();
 }
