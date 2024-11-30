@@ -44,15 +44,15 @@ export class InvitadoRegistroPresenter extends Presenter {
     event.preventDefault();
     console.log(this.model);
     console.log(this.usuarioObject);
-    try {
-      this.model.addUsuario(this.usuarioObject)
+    try{
+      await this.model.addUsuario(this.usuarioObject)
       this.mensajesPresenter.mensaje('Usuario agregado');
       router.navigate('./home.html');
-    } catch (err) {
+      } catch(err) {
       console.log(err);
       this.mensajesPresenter.error(err.message);
-      await this.mensajesPresenter.refresh();
-    }
+      awaitthis.mensajesPresenter.refresh();
+      }
   }
 
   async refresh() {
