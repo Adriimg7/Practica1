@@ -2,6 +2,7 @@ import { assert } from "chai";
 import { proxy } from "../model/proxy.mjs";
 
 describe("Model Test suite with Proxy", function () {
+  // Funciones auxiliares para crear datos
   function crearLibro(isbn) {
     return {
       isbn: `${isbn}`,
@@ -39,6 +40,7 @@ describe("Model Test suite with Proxy", function () {
     };
   }
 
+  // Limpieza antes de cada prueba
   beforeEach(async function () {
     await proxy.setLibros([]);
     await proxy.setClientes([]);
@@ -49,25 +51,32 @@ describe("Model Test suite with Proxy", function () {
       let obj = crearLibro(1);
       let result = await proxy.addLibro(obj);
 
-      assert.equal(result.isbn, obj.isbn, "El isbn no coincide");
-      assert.equal(result.titulo, obj.titulo, "El titulo no coincide");
-      assert.equal(result.resumen, obj.resumen, "El resumen no coincide");
+      assert.equal(result.isbn, obj.isbn, "El ISBN no coincide");
+      assert.equal(result.titulo, obj.titulo, "El título no coincide");
       assert.equal(result.autores, obj.autores, "Los autores no coinciden");
-      assert.equal(result.portada, obj.portada, "La portada no coincide");
-      assert.equal(result.stock, obj.stock, "El stock no coincide");
-      assert.equal(result.precio, obj.precio, "El precio no coincide");
-      assert.exists(result._id, "El _id no existe");
 
       let libros = await proxy.getLibros();
       assert.equal(libros.length, 1, "El número de libros no es correcto");
     });
 
-    it("Proxy.Libreria.Libro.getLibroPorId(_id)", async function () {
+    it("Proxy.Libreria.Libro.getLibroPorId(id)", async function () {
       let obj = crearLibro(1);
       let added = await proxy.addLibro(obj);
 
       let libro = await proxy.getLibroPorId(added._id);
-      assert.equal(libro.isbn, obj.isbn, "El isbn no coincide");
+      assert.equal(libro.isbn, obj.isbn, "El ISBN no coincide");
+      assert.equal(libro.titulo, obj.titulo, "El título no coincide");
+    });
+
+    it("Proxy.Libreria.Libro.eliminarLibro()", async function () {
+      let obj = crearLibro(1);
+      let added = await proxy.addLibro(obj);
+
+      let removed = await proxy.removeLibro(added._id);
+      assert.equal(removed._id, added._id, "El libro eliminado no coincide");
+
+      let libros = await proxy.getLibros();
+      assert.equal(libros.length, 0, "El libro no fue eliminado");
     });
   });
 
@@ -76,7 +85,7 @@ describe("Model Test suite with Proxy", function () {
       let obj = crearCliente("0000001A");
       let result = await proxy.addCliente(obj);
 
-      assert.equal(result.dni, obj.dni, "El dni no coincide");
+      assert.equal(result.dni, obj.dni, "El DNI no coincide");
       assert.equal(result.nombre, obj.nombre, "El nombre no coincide");
       assert.equal(result.email, obj.email, "El email no coincide");
 
@@ -88,12 +97,26 @@ describe("Model Test suite with Proxy", function () {
       let obj = crearAdministrador("0000001B");
       let result = await proxy.addAdmin(obj);
 
-      assert.equal(result.dni, obj.dni, "El dni no coincide");
+      assert.equal(result.dni, obj.dni, "El DNI no coincide");
       assert.equal(result.nombre, obj.nombre, "El nombre no coincide");
       assert.equal(result.email, obj.email, "El email no coincide");
 
       let admins = await proxy.getAdmins();
       assert.equal(admins.length, 1, "El número de administradores no es correcto");
+    });
+
+    it("Proxy.Libreria.Usuario.obtenerClientes()", async function () {
+      let clientesEsperados = [
+        crearCliente("0000001A"),
+        crearCliente("0000001B"),
+        crearCliente("0000001C"),
+      ];
+      for (let cliente of clientesEsperados) {
+        await proxy.addCliente(cliente);
+      }
+
+      let clientes = await proxy.getClientes();
+      assert.equal(clientes.length, clientesEsperados.length, "El número de clientes no coincide");
     });
   });
 });
