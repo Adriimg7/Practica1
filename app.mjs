@@ -243,20 +243,21 @@ app.put('/api/clientes/:id', (req, res) => {
   
 
   app.post('/api/clientes/autenticar', (req, res) => {
-    try {
-        const { email, password, rol } = req.body; // Obtener los datos del cliente desde el cuerpo de la solicitud
-
-        if (!email || !password || !rol) {
-            return res.status(400).json({ error: 'Correo, contraseña y rol son obligatorios' });
-        }
-
-        // Llamar al método autenticar del modelo
-        const clienteAutenticado = model.autenticar({ email, password, rol });
-        res.json(clienteAutenticado); // Devolver el cliente autenticado como respuesta
-    } catch (error) {
-        res.status(400).json({ error: error.message }); // Si ocurre algún error, devolverlo
+    console.log("Datos recibidos en el servidor:", req.body); // Verifica los datos
+    const { email, password, rol } = req.body;
+  
+    if (!email || !password || !rol) {
+      return res.status(400).json({ error: 'Correo, contraseña y rol son obligatorios' });
     }
-});
+  
+    try {
+      const clienteAutenticado = model.autenticar({ email, password, rol });
+      res.json(clienteAutenticado); // Devuelve los datos del usuario autenticado
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+  
 app.post('/api/clientes/signin', (req, res) => {
     try {
         const { email, password, rol } = req.body; // Obtener los datos del cliente desde el cuerpo de la solicitud

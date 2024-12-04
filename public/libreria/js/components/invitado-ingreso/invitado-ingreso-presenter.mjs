@@ -20,7 +20,11 @@ export class InvitadoIngresoPresenter extends Presenter {
   get rolText() { return this.rolSelect.value; }
 
   get usuarioObject() {
-    return { email: this.emailText, password: this.passwordText, rol: this.rolText };
+    return { 
+      email: this.emailText, 
+      password: this.passwordText, 
+      rol: this.rolText 
+    };
   }
 
   // Función para validar los datos antes de enviarlos.
@@ -34,16 +38,21 @@ export class InvitadoIngresoPresenter extends Presenter {
     if (usuario.password.length < 6) {
       throw new Error('La contraseña debe tener al menos 6 caracteres.');
     }
+    if (!['CLIENTE', 'ADMIN'].includes(usuario.rol)) {
+      throw new Error('Rol no válido. Debe ser "CLIENTE" o "ADMIN".');
+    }
   }
 
   async ingresoClick(event) {
     event.preventDefault();
     try {
       const usuario = this.usuarioObject;
+      console.log("Datos del usuario antes de enviar:", usuario); // Verifica los datos
       this.validateUsuario(usuario);  // Validar los datos ingresados
 
       // Llamada al proxy para autenticar al usuario
       const usuarioAutenticado = await proxy.autenticar(usuario);
+      console.log("Usuario autenticado:", usuarioAutenticado); // Verifica la respuesta
 
       libreriaSession.ingreso(usuarioAutenticado); // Guardar la sesión
 

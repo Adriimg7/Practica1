@@ -211,7 +211,8 @@ export class LibreriaProxy {
   }  
 
   async autenticar(obj) {
-    let response = await fetch('/api/autenticar', {
+    console.log("Enviando al servidor:", obj); // Verifica los datos
+    let response = await fetch('/api/clientes/autenticar', {
       method: 'POST',
       body: JSON.stringify(obj),
       headers: { 'Content-Type': 'application/json;charset=utf-8' }
@@ -222,6 +223,7 @@ export class LibreriaProxy {
       throw new Error(`Error ${response.status}: ${response.statusText}`);
     }
   }
+  
 
   async addClienteCarroItem(id, item) {
     let response = await fetch(`/api/clientes/${id}/carro`, {
