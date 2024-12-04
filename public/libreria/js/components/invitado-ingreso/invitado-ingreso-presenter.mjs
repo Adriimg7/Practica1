@@ -3,7 +3,7 @@ import { router } from "../../commons/router.mjs";
 import { libreriaSession } from "../../commons/libreria-session.mjs";
 import { ROL } from "../../model/model.mjs";
 import { MensajesPresenter } from "../mensajes/mensajes-presenter.mjs";
-import {proxy} from "../../commons/proxy.mjs";
+import {proxy} from "../../model/proxy.mjs";
 
 export class InvitadoIngresoPresenter extends Presenter {
   constructor(model, view) {

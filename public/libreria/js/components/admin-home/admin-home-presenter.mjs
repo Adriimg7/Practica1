@@ -4,7 +4,7 @@ import { router } from "../../commons/router.mjs";
 import { model } from "../../model/model.mjs";
 import { AdminCatalogoLibroPresenter } from "../admin-catalogo-libro/admin-catalogo-libro-presenter.mjs";
 import { MensajesPresenter } from "../mensajes/mensajes-presenter.mjs";
-import {proxy} from "../../commons/proxy.mjs";
+import {proxy} from "../../model/proxy.mjs";
 
 export class AdminHomePresenter extends Presenter {
   constructor(model, view) {

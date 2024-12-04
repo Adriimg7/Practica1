@@ -1,4 +1,5 @@
 import { Presenter } from "../../commons/presenter.mjs";
+import {proxy} from "../../model/proxy.mjs";
 
 export class AdminCatalogoLibroPresenter extends Presenter {
   constructor(model, view, parentSelector) {
