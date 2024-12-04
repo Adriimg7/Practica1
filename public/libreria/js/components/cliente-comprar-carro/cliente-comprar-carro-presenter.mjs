@@ -1,6 +1,6 @@
 import { Presenter } from "../../commons/presenter.mjs";
 import { libreriaSession } from "../../commons/libreria-session.mjs";
-import { model } from "../../model/model.mjs";
+import { proxy } from "../../model/proxy.mjs";  // Cambié 'model' por 'proxy'
 
 export class ClienteComprarCarroPresenter extends Presenter {
   constructor(model, view) {
@@ -9,24 +9,29 @@ export class ClienteComprarCarroPresenter extends Presenter {
 
   async refresh() {
     await super.refresh();
-    this.cargarDatosCliente();
-    this.mostrarCarrito();
+    await this.cargarDatosCliente();
+    await this.mostrarCarrito();
   }
 
-  cargarDatosCliente() {
-    const cliente = libreriaSession.getClienteActual();
+  async cargarDatosCliente() {
+    const clienteId = libreriaSession.getUsuarioId();
+    try {
+      const cliente = await proxy.getUsuarioPorId(clienteId);
 
-    if (cliente) {
-      document.querySelector("#dniInput").value = cliente.dni || "";
-      // Dejamos que el usuario edite el campo "Razón Social", sin asignarlo desde el cliente.
-      document.querySelector("#direccionInput").value = cliente.direccion || "";
-      document.querySelector("#emailInput").value = cliente.email || "";
-    } else {
-      console.error("Cliente no encontrado en la sesión.");
+      if (cliente) {
+        document.querySelector("#dniInput").value = cliente.dni || "";
+        // Dejamos que el usuario edite el campo "Razón Social", sin asignarlo desde el cliente.
+        document.querySelector("#direccionInput").value = cliente.direccion || "";
+        document.querySelector("#emailInput").value = cliente.email || "";
+      } else {
+        console.error("Cliente no encontrado en el proxy.");
+      }
+    } catch (error) {
+      console.error("Error al cargar los datos del cliente:", error);
     }
   }
 
-  mostrarCarrito() {
+  async mostrarCarrito() {
     const carrito = libreriaSession.getCarrito();
 
     if (!carrito || carrito.items.length === 0) {
@@ -61,10 +66,24 @@ export class ClienteComprarCarroPresenter extends Presenter {
     document.querySelector("#total-final").textContent = libreriaSession.formatearMoneda(total);
   }
 
-  realizarCompra() {
-    alert("Compra realizada con éxito");
-    libreriaSession.vaciarCarrito(); // Vacía el carrito después de la compra
-    this.mostrarCarrito(); // Refresca el carrito para mostrar que está vacío
+  async realizarCompra() {
+    try {
+      const carrito = libreriaSession.getCarrito();
+      if (!carrito || carrito.items.length === 0) {
+        alert("El carrito está vacío.");
+        return;
+      }
+
+      // Aquí podrías realizar una llamada a la API para procesar la compra, usando el proxy
+      await proxy.procesarCompra(carrito);  // Suponiendo que tienes un método 'procesarCompra' en el proxy
+
+      alert("Compra realizada con éxito");
+      libreriaSession.vaciarCarrito(); // Vacía el carrito después de la compra
+      this.mostrarCarrito(); // Refresca el carrito para mostrar que está vacío
+    } catch (error) {
+      console.error("Error al realizar la compra:", error);
+      alert("Hubo un error al realizar la compra. Intenta nuevamente.");
+    }
   }
 }
 
@@ -74,4 +93,3 @@ document.addEventListener("DOMContentLoaded", () => {
     presenter.realizarCompra();
   });
 });
-

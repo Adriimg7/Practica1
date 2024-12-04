@@ -1,9 +1,8 @@
 import { Presenter } from "../../commons/presenter.mjs";
-import { model } from "../../model/model.mjs";
+import { proxy } from "../../model/proxy.mjs";  // Cambié 'model' por 'proxy'
 import { router } from "../../commons/router.mjs";
 import { libreriaSession } from "../../commons/libreria-session.mjs";
 import { MensajesPresenter } from "../mensajes/mensajes-presenter.mjs";
-import {proxy} from "../../model/proxy.mjs";
 
 export class AdminPerfilPresenter extends Presenter {
   constructor(model, view) {
@@ -28,7 +27,7 @@ export class AdminPerfilPresenter extends Presenter {
   get emailText() { return this.emailInput.value; }
   get contrasenaText() { return this.contrasenaInput.value; }
 
-  // Cargar datos del administrador desde el modelo o sessionStorage
+  // Cargar datos del administrador desde el proxy o sessionStorage
   async cargarDatosAdmin() {
     const adminId = libreriaSession.getUsuarioId();
     try {
@@ -42,14 +41,14 @@ export class AdminPerfilPresenter extends Presenter {
         this.emailInput.value = admin.email;
         this.contrasenaInput.value = admin.password;
       } else {
-        console.error("No se ha encontrado al administrador.");
+        console.error("Administrador no encontrado en el proxy");
       }
     } catch (error) {
-      console.error("Error al cargar los datos del administrador", error);
+      console.error("Error al obtener los datos del administrador:", error);
     }
   }
 
-  // Crear objeto actualizado para enviar al modelo
+  // Crear objeto actualizado para enviar al proxy
   get datosActualizadosAdmin() {
     return {
       _id: libreriaSession.getUsuarioId(),
@@ -68,7 +67,7 @@ export class AdminPerfilPresenter extends Presenter {
 
     try {
       const datosActualizados = this.datosActualizadosAdmin;
-      await proxy.updateUsuario(datosActualizados);
+      await proxy.updateUsuario(datosActualizados);  // Usar el proxy para actualizar los datos del administrador
 
       // Guardar en sessionStorage para que persista tras recargar
       sessionStorage.setItem('adminDatos', JSON.stringify(datosActualizados));
@@ -85,8 +84,8 @@ export class AdminPerfilPresenter extends Presenter {
   // Refrescar la vista
   async refresh() {
     await super.refresh();
-    this.cargarDatosAdmin();
-    this.modificarButton.onclick = (event) => this.guardarPerfil(event);
     await this.mensajesPresenter.refresh();
+    await this.cargarDatosAdmin();  // Obtener datos del administrador usando el proxy
+    this.modificarButton.onclick = (event) => this.guardarPerfil(event);
   }
 }

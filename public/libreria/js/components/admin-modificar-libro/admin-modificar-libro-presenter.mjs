@@ -1,7 +1,6 @@
 import { Presenter } from "../../commons/presenter.mjs";
-import { model } from "../../model/model.mjs";
+import { proxy } from "../../model/proxy.mjs";  // Cambié 'model' por 'proxy'
 import { router } from "../../commons/router.mjs";
-import {proxy} from "../../model/proxy.mjs";
 
 export class AdminModificarLibroPresenter extends Presenter {
   constructor(model, view) {
@@ -60,14 +59,9 @@ export class AdminModificarLibroPresenter extends Presenter {
     this.precioInput.value = value;
   }
 
-  // Cargar los datos del libro en los campos del formulario
-  async getLibroAsync() {
-    try {
-      return await proxy.getLibroPorId(this.id);  // Usar el proxy para obtener el libro
-    } catch (e) {
-      console.error('Error al obtener el libro:', e.message);
-      return null;
-    }
+  // Cargar los datos del libro en los campos del formulario usando el proxy
+  get libro() {
+    return proxy.getLibroPorId(this.id);  // Usamos el proxy para obtener el libro
   }
 
   set libro(libro) {
@@ -81,9 +75,9 @@ export class AdminModificarLibroPresenter extends Presenter {
     }
   }
 
-  async refresh() {
-    await super.refresh();
-    const libro = await this.getLibroAsync();
+  refresh() {
+    super.refresh();
+    const libro = this.libro;
     if (libro) {
       this.libro = libro;
     } else {
@@ -94,7 +88,7 @@ export class AdminModificarLibroPresenter extends Presenter {
     document.querySelector('#modificarLibroForm').onsubmit = (event) => this.modificarClick(event);
   }
 
-  async modificarClick(event) {
+  modificarClick(event) {
     event.preventDefault();
     const libroModificado = {
       _id: this.id,
@@ -105,8 +99,10 @@ export class AdminModificarLibroPresenter extends Presenter {
       stock: parseInt(this.stockInput.value, 10),
       precio: parseFloat(this.precioInput.value)
     };
+
     try {
-      await proxy.updateLibro(libroModificado);
+      // Usamos el proxy para actualizar el libro
+      proxy.updateLibro(libroModificado);  // Enviar los datos del libro al servidor a través del proxy
       router.navigate('/libreria/admin-ver-libro.html?id=' + this.id); // Navega de vuelta a la vista del libro modificado
     } catch (e) {
       console.error('Error al modificar el libro:', e.message);

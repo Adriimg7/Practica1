@@ -1,7 +1,5 @@
 import { Presenter } from "../../commons/presenter.mjs";
-// import { Router } from "../../commons/router.mjs";
-import { model } from "../../model/model.mjs";
-import {proxy} from "../../commons/proxy.mjs";
+import { proxy } from "../../model/proxy.mjs";
 
 export class InvitadoVerLibroPresenter extends Presenter {
   constructor(model, view) {
@@ -16,11 +14,10 @@ export class InvitadoVerLibroPresenter extends Presenter {
     return this.searchParams.get('id');
   }
 
-  // para acceder al modelo, siempre con métodos, no con getters!
-  //Ahora se utiliza el proxy
+  // Para acceder al libro desde la API REST utilizando el proxy.
   async getLibro() {
     try {
-      return await proxy.getLibroPorId(this.id);  // Llamada a la API REST usando el proxy
+      return await proxy.getLibroPorId(this.id);
     } catch (error) {
       console.error("Error al obtener el libro:", error);
       return null;
@@ -28,26 +25,33 @@ export class InvitadoVerLibroPresenter extends Presenter {
   }
 
   get isbnParagraph() {
-    console.log(document);
     return document.querySelector('#isbnParagraph');
   }
 
   set isbn(isbn) {
-    this.isbnParagraph.textContent = isbn;
+    if (this.isbnParagraph) {
+      this.isbnParagraph.textContent = isbn;
+    }
   }
+
   get tituloParagraph() {
     return document.querySelector('#tituloParagraph');
   }
 
   set titulo(titulo) {
-    this.tituloParagraph.textContent = titulo;
+    if (this.tituloParagraph) {
+      this.tituloParagraph.textContent = titulo;
+    }
   }
+
   get autoresParagraph() {
     return document.querySelector('#autoresParagraph');
   }
 
   set autores(autores) {
-    this.autoresParagraph.textContent = autores;
+    if (this.autoresParagraph) {
+      this.autoresParagraph.textContent = autores;
+    }
   }
 
   get resumenParagraph() {
@@ -55,14 +59,19 @@ export class InvitadoVerLibroPresenter extends Presenter {
   }
 
   set resumen(resumen) {
-    this.resumenParagraph.textContent = resumen;
+    if (this.resumenParagraph) {
+      this.resumenParagraph.textContent = resumen;
+    }
   }
+
   get precioParagraph() {
     return document.querySelector('#precioParagraph');
   }
 
   set precio(precio) {
-    this.precioParagraph.textContent = precio;
+    if (this.precioParagraph) {
+      this.precioParagraph.textContent = precio;
+    }
   }
 
   get stockParagraph() {
@@ -70,10 +79,12 @@ export class InvitadoVerLibroPresenter extends Presenter {
   }
 
   set stock(stock) {
-    this.stockParagraph.textContent = stock;
+    if (this.stockParagraph) {
+      this.stockParagraph.textContent = stock;
+    }
   }
 
-  set libro(libro) {    
+  set libro(libro) {
     this.isbn = libro.isbn;
     this.titulo = libro.titulo;
     this.autores = libro.autores;
@@ -85,16 +96,16 @@ export class InvitadoVerLibroPresenter extends Presenter {
   async refresh() {
     await super.refresh();
     console.log(this.id);
-    let libro = await this.getLibro();
-    if (libro) this.libro = libro;
-    else console.error(`Libro ${id} not found!`);
 
+    // Obtener el libro desde la API REST.
+    const libro = await this.getLibro();
+    if (libro) {
+      this.libro = libro;
+    } else {
+      console.error(`Libro con ID ${this.id} no encontrado.`);
+    }
 
-    
-    // cuidado no asignar directamente el método, se pierde this!
-    // document.querySelector('#agregarButton').onclick = event => this.agregarClick(event);
-    // let self = this;
-    // document.querySelector('#agregarButton').onclick = function (event) { self.agregarClick(event) };
+    // Otros eventos o configuraciones necesarios.
+    // Por ejemplo, manejar eventos para botones relacionados.
   }
-
 }

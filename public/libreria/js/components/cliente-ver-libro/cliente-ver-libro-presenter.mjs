@@ -1,5 +1,5 @@
 import { Presenter } from "../../commons/presenter.mjs";
-import { model } from "../../model/model.mjs";
+import { proxy } from "../../model/proxy.mjs";  // Cambié la importación de 'model' a 'proxy'
 import { libreriaSession } from "../../commons/libreria-session.mjs";
 
 export class ClienteVerLibroPresenter extends Presenter {
@@ -17,9 +17,14 @@ export class ClienteVerLibroPresenter extends Presenter {
     return this.searchParams.get('id');
   }
 
-  // Obtiene el libro usando el id desde el modelo
-  getLibro() {
-    return model.getLibroPorId(this.id);
+  // Obtiene el libro usando el id desde el proxy
+  async getLibro() {
+    try {
+      return await proxy.getLibroPorId(this.id);  // Llamada al proxy
+    } catch (error) {
+      console.error("Error al obtener el libro:", error);
+      return null;
+    }
   }
 
   // Acceso a los elementos del DOM y setters para actualizar contenido
@@ -91,7 +96,7 @@ export class ClienteVerLibroPresenter extends Presenter {
   // Actualiza la vista con la información del libro
   async refresh() {
     await super.refresh();
-    const libro = this.getLibro();
+    const libro = await this.getLibro();
     if (libro) {
       this.libro = libro;
     } else {

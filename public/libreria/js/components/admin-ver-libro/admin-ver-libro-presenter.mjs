@@ -1,8 +1,7 @@
 import { Presenter } from "../../commons/presenter.mjs";
 import { router } from "../../commons/router.mjs";
-import { model } from "../../model/model.mjs";
+import { proxy } from "../../model/proxy.mjs";  // Cambié 'model' por 'proxy'
 import { MensajesPresenter } from "../mensajes/mensajes-presenter.mjs";
-import {proxy} from "../../model/proxy.mjs";
 
 export class AdminVerLibroPresenter extends Presenter {
   constructor(model, view) {
@@ -18,11 +17,14 @@ export class AdminVerLibroPresenter extends Presenter {
     return this.searchParams.get('id');
   }
 
+  // Usamos el proxy para obtener el libro
   async getLibro() {
     try {
-      return await proxy.getLibroPorId(this.id);  // Llamada al proxy para obtener el libro
-    } catch (error) {
-      console.error("Error al obtener el libro:", error);
+      return await proxy.getLibroPorId(this.id);
+    } catch (e) {
+      console.error("Error al obtener el libro:", e);
+      this.mensajesPresenter.error('Error al cargar el libro');
+      await this.mensajesPresenter.refresh();
       return null;
     }
   }
@@ -82,13 +84,13 @@ export class AdminVerLibroPresenter extends Presenter {
   async borrarClick(event) {
     event.preventDefault();
     try {
-      await proxy.removeLibro(this.id);
+      await proxy.removeLibro(this.id);  // Usamos el proxy para eliminar el libro
       this.mensajesPresenter.mensaje('Libro borrado!');
       router.navigate('/libreria/admin-home.html');
     } catch (e) {
       console.error(e);
       this.mensajesPresenter.error(e.message);
-      this.mensajesPresenter.refresh();
+      await this.mensajesPresenter.refresh();
     }
   }
 
@@ -99,13 +101,13 @@ export class AdminVerLibroPresenter extends Presenter {
   async desborrarClick(event) {
     event.preventDefault();
     try {
-      await proxy.desborrarLibro(this.id);
+      await proxy.desborrarLibro(this.id);  // Usamos el proxy para desborrar el libro
       this.mensajesPresenter.mensaje('Libro desborrado!');
       router.navigate('/libreria/admin-home.html');
     } catch (e) {
       console.error(e);
       this.mensajesPresenter.error(e.message);
-      this.mensajesPresenter.refresh();
+      await this.mensajesPresenter.refresh();
     }
   }
 
@@ -129,26 +131,27 @@ export class AdminVerLibroPresenter extends Presenter {
     this.precio = libro.precio;
   }
 
+  // Refrescar la vista
   async refresh() {
     await super.refresh();
     await this.mensajesPresenter.refresh();
-    const libro = await this.getLibro();
+    const libro = await this.getLibro();  // Usamos el proxy para obtener el libro
     if (libro) {
       this.libro = libro;
-      this.setModificarLink(); // Configurar el enlace de modificación con el ID correcto
+      this.setModificarLink();  // Configurar el enlace de modificación con el ID correcto
     } else {
       console.error(`Libro con ID ${this.id} no encontrado`);
     }
 
-    if (libro.borrado) {
+    // Control de visibilidad de botones de borrar y desborrar
+    if (libro && libro.borrado) {
       this.borrarLink.parentElement.classList.add('oculto');
     }
     this.borrarLink.onclick = event => this.borrarClick(event);
 
-    if (!libro.borrado) {
+    if (libro && !libro.borrado) {
       this.desborrarLink.parentElement.classList.add('oculto');
     }
     this.desborrarLink.onclick = event => this.desborrarClick(event);
   }
 }
-

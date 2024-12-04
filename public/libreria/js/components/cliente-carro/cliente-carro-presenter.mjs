@@ -1,5 +1,5 @@
 import { Presenter } from "../../commons/presenter.mjs";
-import { model } from "../../model/model.mjs";
+import { proxy } from "../../model/proxy.mjs";  // Cambié 'model' por 'proxy'
 import { libreriaSession } from "../../commons/libreria-session.mjs";
 
 export class ClienteCarroPresenter extends Presenter {
@@ -9,10 +9,10 @@ export class ClienteCarroPresenter extends Presenter {
 
   async refresh() {
     await super.refresh();
-    this.mostrarCarrito();
+    await this.mostrarCarrito();  // Asegúrate de que esta llamada sea asíncrona
   }
 
-  mostrarCarrito() {
+  async mostrarCarrito() {
     const carrito = libreriaSession.getCarrito();
     console.log("Carrito cargado en mostrarCarrito:", carrito);
 
@@ -24,7 +24,6 @@ export class ClienteCarroPresenter extends Presenter {
 
     const listaLibros = document.querySelector("#lista-libros");
     listaLibros.innerHTML = carrito.items.map((item, index) => {
-      console.log("Renderizando item con ID:", item.id);
       const precio = item.precio;
       const total = precio * item.cantidad;
       return `
@@ -41,6 +40,9 @@ export class ClienteCarroPresenter extends Presenter {
           <td align="center">${item.titulo}</td>
           <td align="center">${libreriaSession.formatearMoneda(precio)}</td>
           <td align="center">${libreriaSession.formatearMoneda(total)}</td>
+          <td align="center">
+            <button onclick="presenter.borrarItem('${item.id}')">Eliminar</button>
+          </td>
         </tr>
       `;
     }).join("");
@@ -48,36 +50,27 @@ export class ClienteCarroPresenter extends Presenter {
     this.actualizarTotales();
   }
 
-  actualizarCantidad(id, cantidad) {
-    // console.log("Actualizando cantidad para el item ID:", id, "a:", cantidad);
-    // cantidad = parseInt(cantidad, 10);
-    
-    // if (isNaN(cantidad) || cantidad <= 0) {
-    //   alert("La cantidad debe ser un número válido mayor que 0.");
-    //   return;
-
+  async actualizarCantidad(id, cantidad) {
     if (!id) {
       console.error("No se recibió un ID válido para actualizar la cantidad.");
       return;
     }
-  
-    console.log("Actualizando cantidad para el item ID:", id, "a:", cantidad);
-  
+
     cantidad = parseInt(cantidad, 10);
     
     if (isNaN(cantidad) || cantidad <= 0) {
       alert("La cantidad debe ser un número válido mayor que 0.");
       return;
     }
-  
-    libreriaSession.actualizarCantidadEnCarrito(id, cantidad);
+
+    // Llamar al proxy para actualizar la cantidad en el carrito
+    await proxy.actualizarCantidadEnCarrito(id, cantidad);
+
     console.log("Carrito después de actualizar:", libreriaSession.getCarrito());
     this.mostrarCarrito();
+  }
 
-
-    }
-
-  actualizarTotales() {
+  async actualizarTotales() {
     const carrito = libreriaSession.getCarrito();
     const subtotal = carrito.items.reduce((acc, item) => acc + item.precio * item.cantidad, 0);
     const iva = subtotal * 0.21;
@@ -88,12 +81,13 @@ export class ClienteCarroPresenter extends Presenter {
     document.querySelector("#total-final").textContent = libreriaSession.formatearMoneda(total);
   }
 
-  borrarItem(id) {
-    libreriaSession.eliminarDelCarrito(id);
+  async borrarItem(id) {
+    // Usar el proxy para eliminar el item del carrito
+    await proxy.eliminarDelCarrito(id);
     this.mostrarCarrito();
   }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  window.presenter = new ClienteCarroPresenter(model, "cliente-carro");
+  window.presenter = new ClienteCarroPresenter(proxy, "cliente-carro");
 });

@@ -1,8 +1,7 @@
 import { Presenter } from "../../commons/presenter.mjs";
 import { router } from "../../commons/router.mjs";
-import { model } from "../../model/model.mjs";
+import { proxy } from "../../model/proxy.mjs";  // Cambié 'model' por 'proxy'
 import { MensajesPresenter } from "../mensajes/mensajes-presenter.mjs";
-import {proxy} from "../../model/proxy.mjs";
 
 export class AdminAgregarLibroPresenter extends Presenter {
   constructor(model, view) {
@@ -23,7 +22,7 @@ export class AdminAgregarLibroPresenter extends Presenter {
   }
 
   get tituloAreaText() {
-    return this.tituloArea.textContent;
+    return this.tituloArea.value; // Cambié .textContent por .value
   }
 
   get autoresArea() {
@@ -31,7 +30,7 @@ export class AdminAgregarLibroPresenter extends Presenter {
   }
 
   get autoresAreaText() {
-    return this.autoresArea.textContent;
+    return this.autoresArea.value; // Cambié .textContent por .value
   }
 
   get resumenArea() {
@@ -39,7 +38,7 @@ export class AdminAgregarLibroPresenter extends Presenter {
   }
 
   get resumenAreaText() {
-    return this.resumenArea.textContent;
+    return this.resumenArea.value; // Cambié .textContent por .value
   }
 
   get stockInput() {
@@ -62,25 +61,29 @@ export class AdminAgregarLibroPresenter extends Presenter {
     return document.querySelector('#agregarInput');
   }
 
-
+  // Agregar un libro usando el proxy
   async agregarClick(event) {
     event.preventDefault();
     console.log('Prevented!', event);
+
+    // Crear objeto con los datos del formulario
     let obj = {
       isbn: this.isbnInputText,
       titulo: this.tituloAreaText,
       autores: this.autoresAreaText,
       resumen: this.resumenAreaText,
-      stock: this.stockInputText,
-      precio: this.precioInputText
-    }
+      stock: parseInt(this.stockInputText, 10),  // Aseguramos que stock sea un número
+      precio: parseFloat(this.precioInputText)  // Aseguramos que precio sea un número
+    };
+
     try {
-      let result = model.addLibro(obj);
+      // Usamos el proxy para agregar el libro
+      await proxy.addLibro(obj);
       this.mensajesPresenter.mensaje('Libro agregado!');
       router.navigate('/libreria/admin-home.html');
     } catch (err) {
       console.log(err);
-      this.mensajesPresenter.error(err.message);
+      this.mensajesPresenter.error('Error al agregar el libro');
       await this.mensajesPresenter.refresh();
     }
   }
@@ -88,8 +91,7 @@ export class AdminAgregarLibroPresenter extends Presenter {
   async refresh() {
     await super.refresh();
     await this.mensajesPresenter.refresh();
-    // cuidado no asignar directamente el método, se pierde this!
-    this.agregarInput.onclick = event => this.agregarClick(event);
+    // Asegúrate de que el método de agregar esté correctamente asignado
+    this.agregarInput.onclick = (event) => this.agregarClick(event);
   }
-
 }

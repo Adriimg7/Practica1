@@ -1,9 +1,7 @@
-import { mensajes } from "../../commons/mensajes.mjs";
 import { Presenter } from "../../commons/presenter.mjs";
-import { model } from "../../model/model.mjs";
-import { InvitadoCatalogoLibroPresenter } from "../invitado-catalogo-libro/invitado-catalogo-libro-presenter.mjs";
 import { MensajesPresenter } from "../mensajes/mensajes-presenter.mjs";
-import {proxy} from "../../model/proxy.mjs";
+import { InvitadoCatalogoLibroPresenter } from "../invitado-catalogo-libro/invitado-catalogo-libro-presenter.mjs";
+import { proxy } from "../../model/proxy.mjs";  // Cambié la importación de 'model' a 'proxy'
 
 export class InvitadoHomePresenter extends Presenter {
   constructor(model, view) {
@@ -18,9 +16,22 @@ export class InvitadoHomePresenter extends Presenter {
   async refresh() {
     await super.refresh();
     await this.mensajesPresenter.refresh();
-    let libros = await this.model.getLibros();
-    // Importante!
-    await Promise.all(libros.map(async (l) => { return await new InvitadoCatalogoLibroPresenter(l, 'invitado-catalogo-libro', '#catalogo').refresh() }));    
-  }
 
+    try {
+      // Obtener los libros desde el proxy.
+      let libros = await proxy.getLibros();
+
+      // Crear un Presenter para cada libro y actualizar el catálogo.
+      await Promise.all(
+        libros.map(async (libro) => {
+          const presenter = new InvitadoCatalogoLibroPresenter(libro, 'invitado-catalogo-libro', '#catalogo');
+          await presenter.refresh();
+        })
+      );
+    } catch (error) {
+      console.error('Error al cargar los libros:', error);
+      this.mensajesPresenter.error('No se pudieron cargar los libros. Intenta nuevamente más tarde.');
+      await this.mensajesPresenter.refresh();
+    }
+  }
 }
