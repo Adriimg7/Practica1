@@ -204,21 +204,22 @@ app.post('/api/clientes', (req, res) => {
 });
 
 
+// Obtener un cliente por su ID
 app.get('/api/clientes/:id', (req, res) => {
     try {
-        const clienteId = req.params.id; // Obtener el ID del cliente desde la URL
-        const cliente = model.getClientePorId(clienteId); // Llamar al método del modelo
-
-        if (!cliente) {
-            return res.status(404).json({ error: 'Cliente no encontrado' }); // Si el cliente no existe
-        }
-
-        res.json(cliente); // Si se encuentra el cliente, lo devolvemos
+      const clienteId = req.params.id; // Obtener el ID del cliente desde la URL
+      const cliente = model.getClientePorId(clienteId); // Llamar al método getClientePorId en el modelo
+  
+      if (!cliente) {
+        return res.status(404).json({ error: 'Cliente no encontrado' });
+      }
+  
+      res.json(cliente); // Si el cliente existe, devolver los datos
     } catch (err) {
-        res.status(500).json({ error: err.message }); // Manejo de errores generales
+      res.status(500).json({ error: err.message }); // Error en el servidor
     }
-});
-
+  });
+  
   
 // Eliminar un cliente por ID
 app.delete('/api/clientes/:id', (req, res) => {

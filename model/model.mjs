@@ -227,7 +227,9 @@ removeAdmin(id) {
     this.usuarios.push(admin);
     return admin;
   }
-
+  getClientePorId(id) {
+    return this.clientes.find(cliente => cliente._id === parseInt(id)); // Asumimos que _id es un número
+  }
   getClientes() {
     return this.usuarios.filter((u) => u.rol == ROL.CLIENTE);
   }
