@@ -76,9 +76,9 @@
   <!-- Script para inicializar y mostrar el carrito -->
   <script type="module">
     import { ClienteCarroPresenter } from './ClienteCarroPresenter.mjs';
-    import { model } from './model/model.mjs';
+    import { proxy } from './model/proxy.mjs';  // Usamos el proxy en lugar del modelo
 
-    window.presenter = new ClienteCarroPresenter(model, "cliente-carro");
+    window.presenter = new ClienteCarroPresenter(proxy, "cliente-carro");  // Usamos el proxy
 
     document.addEventListener("DOMContentLoaded", () => {
       presenter.mostrarCarrito();
@@ -86,7 +86,9 @@
       // Funcionalidad del botón "Comprar"
       document.querySelector("#boton-comprar").addEventListener("click", () => {
         alert("Compra realizada con éxito");
-        model.getClienteActual().getCarro().removeItems();  // Vacía el carrito
+        const cliente = proxy.getClienteActual();  // Obtenemos el cliente actual desde el proxy
+        cliente.carro.items = [];  // Vaciar el carrito del cliente
+        proxy.setClienteActual(cliente);  // Actualizar el carrito en el proxy
         presenter.mostrarCarrito(); // Actualiza la vista del carrito
       });
     });
