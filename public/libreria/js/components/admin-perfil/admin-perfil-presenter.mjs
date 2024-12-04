@@ -67,7 +67,7 @@ export class AdminPerfilPresenter extends Presenter {
 
     try {
       const datosActualizados = this.datosActualizadosAdmin;
-      await proxy.updateUsuario(datosActualizados);  // Usar el proxy para actualizar los datos del administrador
+      await proxy.updateAdmin(datosActualizados);  // Usar el proxy para actualizar los datos del administrador
 
       // Guardar en sessionStorage para que persista tras recargar
       sessionStorage.setItem('adminDatos', JSON.stringify(datosActualizados));

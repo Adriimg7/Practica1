@@ -170,8 +170,8 @@ export class LibreriaProxy {
     }
   }  
 
-  async updateUsuario(obj) {
-    let response = await fetch(`/api/usuarios/${obj._id}`, {
+  async updateCliente(obj) {
+    let response = await fetch(`/api/clientes/${obj._id}`, {
       method: 'PUT',
       body: JSON.stringify(obj),
       headers: { 'Content-Type': 'application/json;charset=utf-8' }
@@ -182,6 +182,18 @@ export class LibreriaProxy {
       throw new Error(`Error ${response.status}: ${response.statusText}`);
     }
   }  
+  async updateAdmin(obj) {
+    let response = await fetch(`/api/admins/${obj._id}`, {
+      method: 'PUT',
+      body: JSON.stringify(obj),
+      headers: { 'Content-Type': 'application/json;charset=utf-8' }
+    });
+    if (response.ok) {
+      return await response.json();
+    } else {
+      throw new Error(`Error ${response.status}: ${response.statusText}`);
+    }
+  } 
 
   async getClientePorEmail(email) {
     let response = await fetch(`/api/clientes/email/${email}`);

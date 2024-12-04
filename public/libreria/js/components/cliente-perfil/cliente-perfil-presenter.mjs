@@ -67,7 +67,7 @@ export class ClientePerfilPresenter extends Presenter {
 
     try {
       const datosActualizados = this.datosActualizadosCliente;
-      await proxy.updateUsuario(datosActualizados);  // Usar el proxy para actualizar los datos del cliente
+      await proxy.updateCliente(datosActualizados);  // Usar el proxy para actualizar los datos del cliente
 
       // Guardar en sessionStorage para que persista tras recargar
       sessionStorage.setItem('clienteDatos', JSON.stringify(datosActualizados));
