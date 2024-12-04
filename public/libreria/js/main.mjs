@@ -1,5 +1,5 @@
 import { proxy } from "./model/proxy.mjs";  // Usamos el proxy en lugar de model
-import { seed } from "./model/seeder.mjs";
+
 import { router } from "./commons/router.mjs";
 import { InvitadoHomePresenter } from "./components/invitado-home/invitado-home-presenter.mjs";
 
@@ -20,7 +20,7 @@ import { ClienteFacturasPresenter } from "./components/cliente-facturas/cliente-
 import { ClienteVerCompraPresenter } from "./components/cliente-ver-compra/cliente-ver-compra-presenter.mjs";
 
 export function init() {
-  seed();
+  
 
   // Reemplazamos 'model' por 'proxy' en cada uno de los Presenters
   router.register(/^\/libreria\/index\.html$/, new InvitadoHomePresenter(proxy, 'invitado-home'));
