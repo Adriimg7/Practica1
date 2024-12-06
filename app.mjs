@@ -461,7 +461,7 @@ app.put('/api/admins/:id', async (req, res) => {
   
     try {
       // Buscar el administrador y actualizarlo
-      const admin = await Admin.findByIdAndUpdate(id, updateData, { new: true });
+      const admin = model.usuarios.find(u => u._id == id && u.rol == ROL.ADMIN);
   
       if (!admin) {
         return res.status(404).json({ error: 'Administrador no encontrado' });
@@ -473,8 +473,7 @@ app.put('/api/admins/:id', async (req, res) => {
       // Si hay algún error, devolver un error 500
       res.status(500).json({ error: error.message });
     }
-  });
-  
+  });  
 
 app.post('/api/admins/autenticar', (req, res) => {
     try {
