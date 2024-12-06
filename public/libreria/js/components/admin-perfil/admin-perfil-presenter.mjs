@@ -31,7 +31,7 @@ export class AdminPerfilPresenter extends Presenter {
   async cargarDatosAdmin() {
     const adminId = libreriaSession.getUsuarioId();
     try {
-      const admin = await proxy.getUsuarioPorId(adminId) || JSON.parse(sessionStorage.getItem('adminDatos'));
+      const admin = await proxy.getAdminPorId(adminId) || JSON.parse(sessionStorage.getItem('adminDatos'));
 
       if (admin) {
         this.dniInput.value = admin.dni;

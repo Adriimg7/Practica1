@@ -213,6 +213,14 @@ export class LibreriaProxy {
       throw new Error(`Error ${response.status}: ${response.statusText}`);
     }
   }
+  async getAdminPorId(id) {
+    let response = await fetch(`/api/admins/${id}`);
+    if (response.ok) {
+      return await response.json(); // Retorna el cliente en formato JSON
+    } else {
+      throw new Error(`Error ${response.status}: ${response.statusText}`);
+    }
+  }
 
   async getAdministradorPorEmail(email) {
     let response = await fetch(`/api/admins/email/${email}`);
