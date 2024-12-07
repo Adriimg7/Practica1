@@ -13,7 +13,7 @@ export class LibreriaProxy {
    */
 
   async getLibros() {
-    let response = await fetch('http://localhost:3000/api/libros');
+    let response = await fetch('/api/libros');
     if (response.ok) {
       return await response.json();
     } else {
@@ -48,7 +48,7 @@ export class LibreriaProxy {
   }
 
   async getLibroPorId(id) {
-    let response = await fetch(`http://localhost:3000/api/libros/${id}`);
+    let response = await fetch(`/api/libros/${id}`);
     if (response.ok) {
       return await response.json();
     } else {
@@ -182,18 +182,34 @@ export class LibreriaProxy {
       throw new Error(`Error ${response.status}: ${response.statusText}`);
     }
   }  
+  // async updateAdmin(obj) {
+  //   let response = await fetch(`/api/admins/${obj._id}`, {
+  //     method: 'PUT',
+  //     body: JSON.stringify(obj),
+  //     headers: { 'Content-Type': 'application/json;charset=utf-8' }
+  //   });
+  //   if (response.ok) {
+  //     return await response.json();
+  //   } else {
+  //     throw new Error(`Error ${response.status}: ${response.statusText}`);
+  //   }
+  // } 
   async updateAdmin(obj) {
     let response = await fetch(`/api/admins/${obj._id}`, {
       method: 'PUT',
       body: JSON.stringify(obj),
       headers: { 'Content-Type': 'application/json;charset=utf-8' }
     });
+  
     if (response.ok) {
       return await response.json();
     } else {
-      throw new Error(`Error ${response.status}: ${response.statusText}`);
+      const errorData = await response.json();  // Extrae el mensaje de error del servidor
+      console.error('Error al actualizar:', errorData.error);
+      throw new Error(`Error ${response.status}: ${errorData.error}`);
     }
-  } 
+  }
+  
 
   async getClientePorEmail(email) {
     let response = await fetch(`/api/clientes/email/${email}`);

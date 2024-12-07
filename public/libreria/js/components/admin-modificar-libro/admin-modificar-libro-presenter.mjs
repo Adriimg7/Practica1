@@ -66,27 +66,52 @@ export class AdminModificarLibroPresenter extends Presenter {
 
   set libro(libro) {
     if (libro) {
-      this.isbn = libro.isbn;
-      this.titulo = libro.titulo;
-      this.autores = libro.autores;
-      this.resumen = libro.resumen;
-      this.stock = libro.stock;
-      this.precio = libro.precio;
-    }
-  }
-
-  refresh() {
-    super.refresh();
-    const libro = this.libro;
-    if (libro) {
-      this.libro = libro;
+        if (this.isbnInput) this.isbn = libro.isbn;
+        if (this.tituloInput) this.titulo = libro.titulo;
+        if (this.autoresInput) this.autores = libro.autores;
+        if (this.resumenInput) this.resumen = libro.resumen;
+        if (this.stockInput) this.stock = libro.stock;
+        if (this.precioInput) this.precio = libro.precio;
     } else {
-      console.error(`Libro con ID ${this.id} no encontrado`);
+        console.error("No se pudo cargar el libro. Verifica el ID:", this.id);
+    }
+}
+
+
+  // async refresh() {
+  //   super.refresh();
+  //   const libro = this.libro;
+  //   if (libro) {
+  //     this.libro = libro;
+  //   } else {
+  //     console.error(`Libro con ID ${this.id} no encontrado`);
+  //   }
+
+  //   // Configura el evento submit para guardar modificaciones
+  //   document.querySelector('#modificarLibroForm').onsubmit = (event) => this.modificarClick(event);
+  // }
+  async refresh() {
+    super.refresh();
+    try {
+        const libro = await proxy.getLibroPorId(this.id); // Asegúrate de esperar la promesa
+        if (libro) {
+            this.libro = libro; // Llena el formulario con los datos del libro
+        } else {
+            console.error(`Libro con ID ${this.id} no encontrado`);
+        }
+    } catch (error) {
+        console.error("Error al obtener el libro:", error.message);
     }
 
-    // Configura el evento submit para guardar modificaciones
-    document.querySelector('#modificarLibroForm').onsubmit = (event) => this.modificarClick(event);
-  }
+    // Configurar el evento de envío
+    const form = document.querySelector('#modificarLibroForm');
+    if (form) {
+        form.onsubmit = (event) => this.modificarClick(event);
+    } else {
+        console.error("Formulario no encontrado");
+    }
+}
+
 
   modificarClick(event) {
     event.preventDefault();
@@ -109,3 +134,11 @@ export class AdminModificarLibroPresenter extends Presenter {
     }
   }
 }
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    const presenter = new AdminModificarLibroPresenter(model, view);
+    presenter.refresh();
+  }, 0); // Asegura que el DOM esté completamente cargado
+});
+
+
