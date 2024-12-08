@@ -455,25 +455,17 @@ app.delete('/api/admins/:id', async (req, res) => {
 });
 
   
-app.put('/api/admins/:id', async (req, res) => {
-    const { id } = req.params;
-    const updateData = req.body; // Los datos para actualizar
-  
+app.put('/api/admins/:id', (req, res) => {
     try {
-      // Buscar el administrador y actualizarlo
-      const admin = model.usuarios.find(u => u._id == id && u.rol == ROL.ADMIN);
-  
-      if (!admin) {
-        return res.status(404).json({ error: 'Administrador no encontrado' });
-      }
-  
-      // Devolver el administrador actualizado
-      res.status(200).json(admin);
+      const id = req.params.id; // Obtener el ID del cliente de la URL
+      const data = req.body; // Obtener los datos que quieres actualizar desde el cuerpo de la solicitud
+      const clienteActualizado = model.updateAdmin(id, data); // Llamar al método updateCliente
+      res.json(clienteActualizado); // Devolver el cliente actualizado como respuesta
     } catch (error) {
-      // Si hay algún error, devolver un error 500
-      res.status(500).json({ error: error.message });
+      res.status(400).json({ error: error.message }); // Si hay algún error, devolver un mensaje de error
     }
-  });  
+  });
+  
 
 app.post('/api/admins/autenticar', (req, res) => {
     try {

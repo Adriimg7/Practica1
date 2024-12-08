@@ -195,6 +195,19 @@ updateCliente(id, data) {
   // Devolver el cliente actualizado
   return cliente;
 }
+updateAdmin(id, data) {
+  // Buscar al cliente por su ID
+  const admin = this.getAdminPorId(id); // Usamos el método ya existente getClientePorId
+  if (!admin) {
+    throw new Error("Admin no encontrado"); // Si no existe el cliente, lanzamos un error
+  }
+
+  // Actualizar solo los campos proporcionados en el objeto `data`
+  Object.assign(admin, data); // Asignamos los nuevos valores a las propiedades del cliente
+
+  // Devolver el cliente actualizado
+  return admin;
+}
 autenticar(obj) {
     let email = obj.email;
     let password = obj.password;
@@ -290,8 +303,7 @@ removeAdmins() {
 // Método para buscar administrador por ID
 getAdminPorId(id) {
   // Buscar el administrador por su ID
-  const admin = this.usuarios.find(admin => admin._id === parseInt(id));
-  return admin || null; // Si no se encuentra, devuelve null
+  return this.usuarios.find(u => u.rol == ROL.ADMIN && u._id == id);
 }
   getAdministradorPorEmail(email) {
     return this.usuarios.find(u => u.rol == ROL.ADMIN && u.email == email);
